@@ -1,0 +1,17 @@
+name: "GitHub Event Logger Action"
+description: "Logs GitHub event information and greets someone"
+author: "Your Name"
+inputs:
+  who-to-greet:
+    description: "The name of the person to greet"
+    required: true
+    default: "World"
+outputs:
+  time:
+    description: "The current time"
+runs:
+  using: "node16"
+  main: "src/main.ts"
+pre:
+  - run: npm install
+  - run: npm install -g ts-node typescript
