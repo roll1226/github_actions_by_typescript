@@ -18,7 +18,11 @@ async function run() {
     const time = new Date().toTimeString();
     core.setOutput("time", time);
   } catch (error) {
-    core.setFailed(`Action failed with error: ${error.message}`);
+    if (error instanceof Error) {
+      core.setFailed(`Action failed with error: ${error.message}`);
+    } else {
+      core.setFailed(`Action failed with unknown error: ${error}`);
+    }
   }
 }
 

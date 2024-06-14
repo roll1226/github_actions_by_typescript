@@ -19,13 +19,13 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "16"
+          node-version: "18"
 
       - name: Install dependencies
         run: npm install
 
       - name: Run custom action
-        run: ts-node src/main.ts
+        run: npx ts-node actions/main.ts
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           INPUT_WHO-TO-GREET: "GitHub Actions"

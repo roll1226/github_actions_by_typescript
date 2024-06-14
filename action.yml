@@ -10,8 +10,8 @@ outputs:
   time:
     description: "The current time"
 runs:
-  using: "node16"
-  main: "src/main.ts"
+  using: "node18"
+  main: "actions/main.ts"
 pre:
   - run: npm install
   - run: npm install -g ts-node typescript
