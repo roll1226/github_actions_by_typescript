@@ -1,17 +1,16 @@
-name: "GitHub Event Logger Action"
-description: "Logs GitHub event information and greets someone"
+name: "Slack Notification Action"
+description: "Sends a notification to Slack"
 author: "Your Name"
 inputs:
-  who-to-greet:
-    description: "The name of the person to greet"
+  slack-webhook-url:
+    description: "The Slack webhook URL"
     required: true
-    default: "World"
-outputs:
-  time:
-    description: "The current time"
+  status:
+    description: "The status of the workflow"
+    required: true
 runs:
-  using: "node18"
-  main: "actions/main.ts"
+  using: "node16"
+  main: "dist/main.js"
 pre:
   - run: npm install
-  - run: npm install -g ts-node typescript
+  - run: npm install -g ts-node
