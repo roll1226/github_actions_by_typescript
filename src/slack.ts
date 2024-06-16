@@ -1,13 +1,28 @@
 import * as core from "@actions/core";
 import axios from "axios";
 
-async function notifySlack(message: string) {
+async function sendOrUpdateSlackNotification(
+  webhookUrl: string,
+  message: string,
+  threadTs?: string
+): Promise<string | undefined> {
   try {
-    const webhookUrl = core.getInput("slack-webhook-url");
-    if (!webhookUrl) {
-      throw new Error("SLACK_WEBHOOK_URL is not set");
+    const payload: any = {
+      text: message,
+    };
+
+    if (threadTs) {
+      payload.ts = threadTs;
+      payload.text += `\n(Timestamp: ${threadTs})`; // Add the TS for reference if needed
     }
-    await axios.post(webhookUrl, { text: message });
+
+    const response = await axios.post(webhookUrl, payload);
+
+    if (response.status === 200) {
+      return response.data.ts; // Return the thread_ts or message_ts
+    } else {
+      core.setFailed(`Slack API responded with status code ${response.status}`);
+    }
   } catch (error) {
     core.setFailed(
       `Failed to send Slack notification: ${(error as Error).message}`
@@ -15,29 +30,28 @@ async function notifySlack(message: string) {
   }
 }
 
-async function run() {
+async function run(): Promise<void> {
   try {
+    const webhookUrl = core.getInput("slack-webhook-url");
     const status = core.getInput("status");
-    if (!status) {
-      throw new Error("Status is not provided");
-    }
+    const runId = core.getInput("run-id");
+    const jobName = core.getInput("job-name");
 
-    let message = "";
-    switch (status) {
-      case "start":
-        message = "GitHub Actions workflow started :rocket:";
-        break;
-      case "success":
-        message = "GitHub Actions workflow completed successfully :tada:";
-        break;
-      case "failure":
-        message = "GitHub Actions workflow failed :x:";
-        break;
-      default:
-        throw new Error(`Unknown status: ${status}`);
-    }
+    let threadTs: string | undefined = core.getState("slack-thread-ts");
+    const messageBase = `Job ${jobName} with run ID ${runId}`;
 
-    await notifySlack(message);
+    let message: string;
+    if (status === "start") {
+      message = `${messageBase} has started.`;
+      threadTs = await sendOrUpdateSlackNotification(webhookUrl, message);
+      core.saveState("slack-thread-ts", threadTs || "");
+    } else if (status === "success") {
+      message = `${messageBase} has succeeded.`;
+      await sendOrUpdateSlackNotification(webhookUrl, message, threadTs);
+    } else if (status === "failure") {
+      message = `${messageBase} has failed.`;
+      await sendOrUpdateSlackNotification(webhookUrl, message, threadTs);
+    }
   } catch (error) {
     core.setFailed(`Action failed with error: ${(error as Error).message}`);
   }

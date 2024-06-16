@@ -11,7 +11,6 @@ on:
 jobs:
   notify:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -24,26 +23,35 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Notify Slack (start)
+      - name: Send Slack notification (start)
+        id: notify_start
         uses: ./actions/yml/slack
         with:
           slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
           status: "start"
+          run-id: ${{ github.run_id }}
+          job-name: ${{ github.job }}
 
-      - name: Run custom action
-        run: echo "Running the main action"
-        # ここにメインのビルドやテストのステップを追加
+      - name: Run some job
+        run: echo "Running job..."
+        continue-on-error: true
 
-      - name: Notify Slack (success)
+      - name: Send Slack notification (success)
         if: success()
+        id: notify_success
         uses: ./actions/yml/slack
         with:
           slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
           status: "success"
+          run-id: ${{ github.run_id }}
+          job-name: ${{ github.job }}
 
-      - name: Notify Slack (failure)
+      - name: Send Slack notification (failure)
         if: failure()
+        id: notify_failure
         uses: ./actions/yml/slack
         with:
           slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
           status: "failure"
+          run-id: ${{ github.run_id }}
+          job-name: ${{ github.job }}

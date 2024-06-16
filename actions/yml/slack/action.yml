@@ -8,6 +8,12 @@ inputs:
   status:
     description: "The status of the workflow"
     required: true
+  run-id:
+    description: "The GitHub Actions run ID"
+    required: true
+  job-name:
+    description: "The GitHub Actions job name"
+    required: true
 runs:
-  using: "node16"
+  using: "node20"
   main: "../../../dist/src/slack.js"
