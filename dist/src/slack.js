@@ -49,12 +49,34 @@ function sendOrUpdateSlackNotification(token, channel, message, threadTs) {
                 payload.thread_ts = threadTs;
             }
             console.log("Sending payload:", JSON.stringify(payload, null, 2)); // デバッグ用ログ
-            const response = yield axios_1.default.post("https://slack.com/api/chat.postMessage", payload, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json; charset=utf-8",
-                },
-            });
+            let response;
+            if (threadTs) {
+                // Update existing message in the thread
+                response = yield axios_1.default.post("https://slack.com/api/chat.update", {
+                    channel: channel,
+                    text: message,
+                    ts: threadTs,
+                    token: token,
+                }, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json; charset=utf-8",
+                    },
+                });
+            }
+            else {
+                // Send new message to the thread
+                response = yield axios_1.default.post("https://slack.com/api/chat.postMessage", {
+                    channel: channel,
+                    text: message,
+                    token: token,
+                }, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json; charset=utf-8",
+                    },
+                });
+            }
             console.log("Slack API response:", response.data); // デバッグ用ログ
             if (response.data.ok) {
                 return response.data.ts;
@@ -76,14 +98,15 @@ function run() {
             const status = core.getInput("status");
             const runId = core.getInput("run-id");
             const jobName = core.getInput("job-name");
-            let threadTs = core.getState("slack-thread-ts");
+            let threadTs = core.getInput("slack_thread_ts");
             const messageBase = `Job ${jobName} with run ID ${runId}`;
             let message;
             if (status === "start") {
                 message = `${messageBase} has started.`;
                 threadTs = yield sendOrUpdateSlackNotification(token, channel, message);
                 if (threadTs) {
-                    core.saveState("slack-thread-ts", threadTs);
+                    // core.saveState("slack-thread-ts", threadTs);
+                    core.setOutput("slack-thread-ts", threadTs);
                 }
             }
             else if (status === "success") {
@@ -94,6 +117,7 @@ function run() {
                 message = `${messageBase} has failed.`;
                 yield sendOrUpdateSlackNotification(token, channel, message, threadTs);
             }
+            console.log(core.getState("slack-thread-ts"));
         }
         catch (error) {
             core.setFailed(`Action failed with error: ${error.message}`);

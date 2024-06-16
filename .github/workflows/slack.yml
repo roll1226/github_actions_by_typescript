@@ -47,6 +47,7 @@ jobs:
           status: 'success'
           run-id: ${{ github.run_id }}
           job-name: ${{ github.job }}
+          slack_thread_ts: ${{ steps.notify_start.outputs.slack-thread-ts }}
         env:
           SLACK_THREAD_TS: ${{ steps.notify_start.outputs.slack-thread-ts }}
 
@@ -60,5 +61,6 @@ jobs:
           status: 'failure'
           run-id: ${{ github.run_id }}
           job-name: ${{ github.job }}
+          slack_thread_ts: ${{ steps.notify_start.outputs.slack-thread-ts }}
         env:
           SLACK_THREAD_TS: ${{ steps.notify_start.outputs.slack-thread-ts }}
