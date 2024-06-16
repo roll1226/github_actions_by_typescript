@@ -27,7 +27,7 @@ jobs:
       - name: Notify Slack (start)
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        run: npx ts-node src/main.ts --status start --slack-webhook-url $SLACK_WEBHOOK_URL
+        run: npx ts-node actions/slack.ts --status start --slack-webhook-url $SLACK_WEBHOOK_URL
 
       - name: Run custom action
         run: echo "Running the main action"
@@ -36,10 +36,10 @@ jobs:
         if: success()
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        run: npx ts-node src/main.ts --status success --slack-webhook-url $SLACK_WEBHOOK_URL
+        run: npx ts-node actions/slack.ts --status success --slack-webhook-url $SLACK_WEBHOOK_URL
 
       - name: Notify Slack (failure)
         if: failure()
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        run: npx ts-node src/main.ts --status failure --slack-webhook-url $SLACK_WEBHOOK_URL
+        run: npx ts-node actions/slack.ts --status failure --slack-webhook-url $SLACK_WEBHOOK_URL
