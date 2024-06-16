@@ -2,13 +2,16 @@ import * as core from "@actions/core";
 import axios from "axios";
 
 async function sendOrUpdateSlackNotification(
-  webhookUrl: string,
+  token: string,
+  channel: string,
   message: string,
   threadTs?: string
 ): Promise<string | undefined> {
   try {
     const payload: any = {
-      text: message,
+      channel: channel,
+      text: message + `ThreadTs: ${threadTs ?? ""}`,
+      token: token,
     };
 
     if (threadTs) {
@@ -17,20 +20,23 @@ async function sendOrUpdateSlackNotification(
 
     console.log("Sending payload:", JSON.stringify(payload, null, 2)); // デバッグ用ログ
 
-    const response = await axios.post(webhookUrl, payload);
-
-    console.log("Slack API response status:", response.status); // ステータスコードの確認
-
-    if (response.status === 200) {
-      console.log("Slack API response data:", response.data); // デバッグ用ログ
-      if (!threadTs) {
-        // スレッドTSがない場合、新しいメッセージのTSを返す
-        return response.data.ts;
+    const response = await axios.post(
+      "https://slack.com/api/chat.postMessage",
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json; charset=utf-8",
+        },
       }
+    );
+
+    console.log("Slack API response:", response.data); // デバッグ用ログ
+
+    if (response.data.ok) {
+      return response.data.ts;
     } else {
-      core.setFailed(
-        `Slack API responded with status code: ${response.status}`
-      );
+      core.setFailed(`Slack API responded with error: ${response.data.error}`);
     }
   } catch (error) {
     core.setFailed(
@@ -41,7 +47,8 @@ async function sendOrUpdateSlackNotification(
 
 async function run(): Promise<void> {
   try {
-    const webhookUrl = core.getInput("slack-webhook-url");
+    const token = core.getInput("slack-token");
+    const channel = core.getInput("slack-channel");
     const status = core.getInput("status");
     const runId = core.getInput("run-id");
     const jobName = core.getInput("job-name");
@@ -52,16 +59,16 @@ async function run(): Promise<void> {
     let message: string;
     if (status === "start") {
       message = `${messageBase} has started.`;
-      threadTs = await sendOrUpdateSlackNotification(webhookUrl, message);
+      threadTs = await sendOrUpdateSlackNotification(token, channel, message);
       if (threadTs) {
         core.saveState("slack-thread-ts", threadTs);
       }
     } else if (status === "success") {
       message = `${messageBase} has succeeded.`;
-      await sendOrUpdateSlackNotification(webhookUrl, message, threadTs);
+      await sendOrUpdateSlackNotification(token, channel, message, threadTs);
     } else if (status === "failure") {
       message = `${messageBase} has failed.`;
-      await sendOrUpdateSlackNotification(webhookUrl, message, threadTs);
+      await sendOrUpdateSlackNotification(token, channel, message, threadTs);
     }
   } catch (error) {
     core.setFailed(`Action failed with error: ${(error as Error).message}`);

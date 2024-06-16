@@ -37,27 +37,30 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(require("@actions/core"));
 const axios_1 = __importDefault(require("axios"));
-function sendOrUpdateSlackNotification(webhookUrl, message, threadTs) {
+function sendOrUpdateSlackNotification(token, channel, message, threadTs) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const payload = {
-                text: message,
+                channel: channel,
+                text: message + `ThreadTs: ${threadTs !== null && threadTs !== void 0 ? threadTs : ""}`,
+                token: token,
             };
             if (threadTs) {
                 payload.thread_ts = threadTs;
             }
             console.log("Sending payload:", JSON.stringify(payload, null, 2)); // デバッグ用ログ
-            const response = yield axios_1.default.post(webhookUrl, payload);
-            console.log("Slack API response status:", response.status); // ステータスコードの確認
-            if (response.status === 200) {
-                console.log("Slack API response data:", response.data); // デバッグ用ログ
-                if (!threadTs) {
-                    // スレッドTSがない場合、新しいメッセージのTSを返す
-                    return response.data.ts;
-                }
+            const response = yield axios_1.default.post("https://slack.com/api/chat.postMessage", payload, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json; charset=utf-8",
+                },
+            });
+            console.log("Slack API response:", response.data); // デバッグ用ログ
+            if (response.data.ok) {
+                return response.data.ts;
             }
             else {
-                core.setFailed(`Slack API responded with status code: ${response.status}`);
+                core.setFailed(`Slack API responded with error: ${response.data.error}`);
             }
         }
         catch (error) {
@@ -68,7 +71,8 @@ function sendOrUpdateSlackNotification(webhookUrl, message, threadTs) {
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const webhookUrl = core.getInput("slack-webhook-url");
+            const token = core.getInput("slack-token");
+            const channel = core.getInput("slack-channel");
             const status = core.getInput("status");
             const runId = core.getInput("run-id");
             const jobName = core.getInput("job-name");
@@ -77,18 +81,18 @@ function run() {
             let message;
             if (status === "start") {
                 message = `${messageBase} has started.`;
-                threadTs = yield sendOrUpdateSlackNotification(webhookUrl, message);
+                threadTs = yield sendOrUpdateSlackNotification(token, channel, message);
                 if (threadTs) {
                     core.saveState("slack-thread-ts", threadTs);
                 }
             }
             else if (status === "success") {
                 message = `${messageBase} has succeeded.`;
-                yield sendOrUpdateSlackNotification(webhookUrl, message, threadTs);
+                yield sendOrUpdateSlackNotification(token, channel, message, threadTs);
             }
             else if (status === "failure") {
                 message = `${messageBase} has failed.`;
-                yield sendOrUpdateSlackNotification(webhookUrl, message, threadTs);
+                yield sendOrUpdateSlackNotification(token, channel, message, threadTs);
             }
         }
         catch (error) {

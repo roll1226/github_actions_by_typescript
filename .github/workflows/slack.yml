@@ -27,8 +27,9 @@ jobs:
         id: notify_start
         uses: ./actions/yml/slack
         with:
-          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
-          status: "start"
+          slack-token: ${{ secrets.SLACK_TOKEN }}
+          slack-channel: ${{ secrets.SLACK_CHANNEL }}
+          status: 'start'
           run-id: ${{ github.run_id }}
           job-name: ${{ github.job }}
 
@@ -41,17 +42,23 @@ jobs:
         id: notify_success
         uses: ./actions/yml/slack
         with:
-          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
-          status: "success"
+          slack-token: ${{ secrets.SLACK_TOKEN }}
+          slack-channel: ${{ secrets.SLACK_CHANNEL }}
+          status: 'success'
           run-id: ${{ github.run_id }}
           job-name: ${{ github.job }}
+        env:
+          SLACK_THREAD_TS: ${{ steps.notify_start.outputs.slack-thread-ts }}
 
       - name: Send Slack notification (failure)
         if: failure()
         id: notify_failure
         uses: ./actions/yml/slack
         with:
-          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
-          status: "failure"
+          slack-token: ${{ secrets.SLACK_TOKEN }}
+          slack-channel: ${{ secrets.SLACK_CHANNEL }}
+          status: 'failure'
           run-id: ${{ github.run_id }}
           job-name: ${{ github.job }}
+        env:
+          SLACK_THREAD_TS: ${{ steps.notify_start.outputs.slack-thread-ts }}
