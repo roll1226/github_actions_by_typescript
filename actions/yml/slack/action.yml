@@ -10,7 +10,8 @@ inputs:
     required: true
 runs:
   using: "node16"
-  main: "dist/main.js"
+  main: "src/main.ts"
 pre:
   - run: npm install
   - run: npm install -g ts-node
+  - run: ts-node src/main.ts
