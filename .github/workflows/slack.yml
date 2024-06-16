@@ -19,13 +19,13 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "16"
+          node-version: "18"
 
       - name: Install dependencies
         run: npm install
 
       - name: Notify Slack (start)
-        uses: ./actions/yml/slack # ローカルアクションを指定
+        uses: ./actions/yml/slack
         with:
           slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
           status: "start"
@@ -36,14 +36,14 @@ jobs:
 
       - name: Notify Slack (success)
         if: success()
-        uses: ./actions/yml/slack # ローカルアクションを指定
+        uses: ./actions/yml/slack
         with:
           slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
           status: "success"
 
       - name: Notify Slack (failure)
         if: failure()
-        uses: ./actions/yml/slack # ローカルアクションを指定
+        uses: ./actions/yml/slack
         with:
           slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
           status: "failure"

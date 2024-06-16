@@ -7,9 +7,7 @@ async function notifySlack(message: string) {
     if (!webhookUrl) {
       throw new Error("SLACK_WEBHOOK_URL is not set");
     }
-    await axios.post(webhookUrl, {
-      text: message,
-    });
+    await axios.post(webhookUrl, { text: message });
   } catch (error) {
     core.setFailed(
       `Failed to send Slack notification: ${(error as Error).message}`
@@ -20,16 +18,23 @@ async function notifySlack(message: string) {
 async function run() {
   try {
     const status = core.getInput("status");
-    let message = "";
+    if (!status) {
+      throw new Error("Status is not provided");
+    }
 
-    if (status === "start") {
-      message = "GitHub Actions workflow started :rocket:";
-    } else if (status === "success") {
-      message = "GitHub Actions workflow completed successfully :tada:";
-    } else if (status === "failure") {
-      message = "GitHub Actions workflow failed :x:";
-    } else {
-      throw new Error(`Unknown status: ${status}`);
+    let message = "";
+    switch (status) {
+      case "start":
+        message = "GitHub Actions workflow started :rocket:";
+        break;
+      case "success":
+        message = "GitHub Actions workflow completed successfully :tada:";
+        break;
+      case "failure":
+        message = "GitHub Actions workflow failed :x:";
+        break;
+      default:
+        throw new Error(`Unknown status: ${status}`);
     }
 
     await notifySlack(message);
