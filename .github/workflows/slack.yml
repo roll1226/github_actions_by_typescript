@@ -33,7 +33,7 @@ jobs:
           job-name: ${{ github.job }}
 
       - name: Run some job
-        run: echo "Running job..."
+        run: npm install
         continue-on-error: true
 
       - name: Send Slack notification (success)

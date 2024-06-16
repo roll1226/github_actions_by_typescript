@@ -44,15 +44,20 @@ function sendOrUpdateSlackNotification(webhookUrl, message, threadTs) {
                 text: message,
             };
             if (threadTs) {
-                payload.ts = threadTs;
-                payload.text += `\n(Timestamp: ${threadTs})`; // Add the TS for reference if needed
+                payload.thread_ts = threadTs;
             }
+            console.log("Sending payload:", JSON.stringify(payload, null, 2)); // デバッグ用ログ
             const response = yield axios_1.default.post(webhookUrl, payload);
+            console.log("Slack API response status:", response.status); // ステータスコードの確認
             if (response.status === 200) {
-                return response.data.ts; // Return the thread_ts or message_ts
+                console.log("Slack API response data:", response.data); // デバッグ用ログ
+                if (!threadTs) {
+                    // スレッドTSがない場合、新しいメッセージのTSを返す
+                    return response.data.ts;
+                }
             }
             else {
-                core.setFailed(`Slack API responded with status code ${response.status}`);
+                core.setFailed(`Slack API responded with status code: ${response.status}`);
             }
         }
         catch (error) {
@@ -73,7 +78,9 @@ function run() {
             if (status === "start") {
                 message = `${messageBase} has started.`;
                 threadTs = yield sendOrUpdateSlackNotification(webhookUrl, message);
-                core.saveState("slack-thread-ts", threadTs || "");
+                if (threadTs) {
+                    core.saveState("slack-thread-ts", threadTs);
+                }
             }
             else if (status === "success") {
                 message = `${messageBase} has succeeded.`;
