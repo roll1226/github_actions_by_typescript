@@ -1,9 +1,12 @@
 name: "Slack Notification Action"
-description: "Sends a notification to Slack"
+description: "Sends or updates a notification in Slack"
 author: "Your Name"
 inputs:
-  slack-webhook-url:
-    description: "The Slack webhook URL"
+  slack-token:
+    description: "The Slack OAuth token"
+    required: true
+  slack-channel:
+    description: "The Slack channel ID"
     required: true
   status:
     description: "The status of the workflow"
@@ -13,6 +16,18 @@ inputs:
     required: true
   job-name:
     description: "The GitHub Actions job name"
+    required: true
+  repository:
+    description: "The GitHub repository name"
+    required: true
+  ref:
+    description: "The GitHub ref"
+    required: true
+  event-name:
+    description: "The GitHub event name"
+    required: true
+  workflow:
+    description: "The GitHub workflow name"
     required: true
 runs:
   using: "node20"

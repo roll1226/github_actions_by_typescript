@@ -1,16 +1,24 @@
 import * as core from "@actions/core";
 import axios from "axios";
+import { BaseAttachmentFields, baseAttachment } from "./slack/baseAttachment";
+import { JobStatus } from "./slack/jobStatus";
 
 const SLACK_API = {
   POST: "https://slack.com/api/chat.postMessage",
   UPDATE: "https://slack.com/api/chat.update",
 };
 
+type SlackAttachment = {
+  pretext: string;
+  color: string;
+  fields: BaseAttachmentFields[];
+};
+
 type SlackApiProp = {
   url: string;
   data: {
     channel: string;
-    text: string;
+    attachments: SlackAttachment[];
     ts?: string;
     token: string;
   };
@@ -39,47 +47,32 @@ const slackApi: SlackApi = async ({ url, data, token }) => {
 const sendOrUpdateSlackNotification = async (
   token: string,
   channel: string,
-  message: string,
+  attachments: SlackAttachment[],
   threadTs?: string
 ): Promise<string | undefined> => {
   try {
-    const payload: any = {
-      channel: channel,
-      text: message + `ThreadTs: ${threadTs ?? ""}`,
-      token: token,
-    };
+    // console.log("Sending payload:", JSON.stringify(payload, null, 2)); // デバッグ用ログ
 
-    if (threadTs) {
-      payload.thread_ts = threadTs;
-    }
-
-    console.log("Sending payload:", JSON.stringify(payload, null, 2)); // デバッグ用ログ
-
-    let response;
-    if (threadTs) {
-      // Update existing message in the thread
-      response = await slackApi({
-        url: SLACK_API.UPDATE,
-        data: {
-          channel: channel,
-          text: message,
-          ts: threadTs,
-          token: token,
-        },
-        token,
-      });
-    } else {
-      // Send new message to the thread
-      response = await slackApi({
-        url: SLACK_API.POST,
-        data: {
-          channel: channel,
-          text: message,
-          token: token,
-        },
-        token,
-      });
-    }
+    const response = threadTs
+      ? await slackApi({
+          url: SLACK_API.UPDATE,
+          data: {
+            channel,
+            attachments,
+            ts: threadTs,
+            token,
+          },
+          token,
+        })
+      : await slackApi({
+          url: SLACK_API.POST,
+          data: {
+            channel,
+            attachments,
+            token,
+          },
+          token,
+        });
 
     if (response.data.ok) {
       return response.data.ts;
@@ -97,28 +90,70 @@ const run = async (): Promise<void> => {
   try {
     const token = core.getInput("slack-token");
     const channel = core.getInput("slack-channel");
-    const status = core.getInput("status");
+    const status = core.getInput("status") as JobStatus;
     const runId = core.getInput("run-id");
     const jobName = core.getInput("job-name");
+    const repository = core.getInput("repository");
+    const ref = core.getInput("ref");
+    const eventName = core.getInput("event-name");
+    const workflow = core.getInput("workflow");
 
     let threadTs: string | undefined = core.getInput("slack_thread_ts");
-    const messageBase = `Job ${jobName} with run ID ${runId}`;
 
-    let message: string;
+    const attachment = baseAttachment(
+      status,
+      repository,
+      ref,
+      eventName,
+      workflow,
+      runId
+    );
     if (status === "start") {
-      message = `${messageBase} has started.`;
-      threadTs = await sendOrUpdateSlackNotification(token, channel, message);
+      const attachments: SlackAttachment[] = [
+        {
+          pretext: `Job ${jobName} with run ID ${runId} has started.`,
+          color: attachment.color,
+          fields: attachment.fields,
+        },
+      ];
+      threadTs = await sendOrUpdateSlackNotification(
+        token,
+        channel,
+        attachments
+      );
       if (threadTs) {
-        // core.saveState("slack-thread-ts", threadTs);
         core.setOutput("slack-thread-ts", threadTs);
       }
     } else if (status === "success") {
-      message = `${messageBase} has succeeded.`;
-      await sendOrUpdateSlackNotification(token, channel, message, threadTs);
+      const attachments = [
+        {
+          pretext: `Job ${jobName} with run ID ${runId} has succeeded.`,
+          color: attachment.color,
+          fields: attachment.fields,
+        },
+      ];
+      await sendOrUpdateSlackNotification(
+        token,
+        channel,
+        attachments,
+        threadTs
+      );
     } else if (status === "failure") {
-      message = `${messageBase} has failed.`;
-      await sendOrUpdateSlackNotification(token, channel, message, threadTs);
+      const attachments = [
+        {
+          pretext: `Job ${jobName} with run ID ${runId} has failed.`,
+          color: attachment.color,
+          fields: attachment.fields,
+        },
+      ];
+      await sendOrUpdateSlackNotification(
+        token,
+        channel,
+        attachments,
+        threadTs
+      );
     }
+
     console.log(core.getState("slack-thread-ts"));
   } catch (error) {
     core.setFailed(`Action failed with error: ${(error as Error).message}`);
