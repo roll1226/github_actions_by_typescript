@@ -1,12 +1,47 @@
 import * as core from "@actions/core";
 import axios from "axios";
 
-async function sendOrUpdateSlackNotification(
+const SLACK_API = {
+  POST: "https://slack.com/api/chat.postMessage",
+  UPDATE: "https://slack.com/api/chat.update",
+};
+
+type SlackApiProp = {
+  url: string;
+  data: {
+    channel: string;
+    text: string;
+    ts?: string;
+    token: string;
+  };
+  token: string;
+};
+
+type SlackApiReturn = {
+  data: {
+    ok: boolean;
+    error: string;
+    ts: string;
+  };
+};
+
+type SlackApi = ({ url, data }: SlackApiProp) => Promise<SlackApiReturn>;
+
+const slackApi: SlackApi = async ({ url, data, token }) => {
+  return await axios.post(url, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json; charset=utf-8",
+    },
+  });
+};
+
+const sendOrUpdateSlackNotification = async (
   token: string,
   channel: string,
   message: string,
   threadTs?: string
-): Promise<string | undefined> {
+): Promise<string | undefined> => {
   try {
     const payload: any = {
       channel: channel,
@@ -23,40 +58,28 @@ async function sendOrUpdateSlackNotification(
     let response;
     if (threadTs) {
       // Update existing message in the thread
-      response = await axios.post(
-        "https://slack.com/api/chat.update",
-        {
+      response = await slackApi({
+        url: SLACK_API.UPDATE,
+        data: {
           channel: channel,
           text: message,
           ts: threadTs,
           token: token,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json; charset=utf-8",
-          },
-        }
-      );
+        token,
+      });
     } else {
       // Send new message to the thread
-      response = await axios.post(
-        "https://slack.com/api/chat.postMessage",
-        {
+      response = await slackApi({
+        url: SLACK_API.POST,
+        data: {
           channel: channel,
           text: message,
           token: token,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json; charset=utf-8",
-          },
-        }
-      );
+        token,
+      });
     }
-
-    console.log("Slack API response:", response.data); // デバッグ用ログ
 
     if (response.data.ok) {
       return response.data.ts;
@@ -68,9 +91,9 @@ async function sendOrUpdateSlackNotification(
       `Failed to send Slack notification: ${(error as Error).message}`
     );
   }
-}
+};
 
-async function run(): Promise<void> {
+const run = async (): Promise<void> => {
   try {
     const token = core.getInput("slack-token");
     const channel = core.getInput("slack-channel");
@@ -100,6 +123,6 @@ async function run(): Promise<void> {
   } catch (error) {
     core.setFailed(`Action failed with error: ${(error as Error).message}`);
   }
-}
+};
 
 run();
