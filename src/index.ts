@@ -1,5 +1,7 @@
-type Add<T> = (a: T, b: T) => T;
+import app from "./app";
 
-export const add: Add<number> = (a, b) => {
-  return a + b;
-};
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
