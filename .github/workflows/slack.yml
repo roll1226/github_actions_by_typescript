@@ -23,6 +23,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Compile TypeScript
+        run: npx tsc
+
       - name: Send Slack notification (start)
         id: notify_start
         uses: ./actions/yml/slack
@@ -37,9 +40,8 @@ jobs:
           event-name: ${{ github.event_name }}
           workflow: ${{ github.workflow }}
 
-      - name: Run some job
-        run: npm install
-        continue-on-error: true
+      - name: Run tests
+        run: npm test
 
       - name: Send Slack notification (success)
         if: success()
