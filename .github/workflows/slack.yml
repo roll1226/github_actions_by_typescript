@@ -9,13 +9,15 @@ on:
       - main
 
 jobs:
-  notify:
+  notify_test_start:
     runs-on: ubuntu-latest
+    outputs:
+      slackThreadTs: ${{ steps.notify_test_start.outputs.slack-thread-ts }}
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Use Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
           node-version: "18"
@@ -23,11 +25,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Compile TypeScript
-        run: npx tsc
+      - name: Build project
+        run: npm run build
 
-      - name: Send Slack notification (start)
-        id: notify_start
+      - name: Send Slack notification (test start)
+        id: notify_test_start
         uses: ./actions/yml/slack
         with:
           slack-token: ${{ secrets.SLACK_TOKEN }}
@@ -40,12 +42,30 @@ jobs:
           event-name: ${{ github.event_name }}
           workflow: ${{ github.workflow }}
 
+  test:
+    runs-on: ubuntu-latest
+    needs: notify_test_start
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build
+
       - name: Run tests
         run: npm test
 
-      - name: Send Slack notification (success)
+      - name: Send Slack notification (test success)
         if: success()
-        id: notify_success
+        id: notify_test_success
         uses: ./actions/yml/slack
         with:
           slack-token: ${{ secrets.SLACK_TOKEN }}
@@ -57,11 +77,11 @@ jobs:
           ref: ${{ github.ref }}
           event-name: ${{ github.event_name }}
           workflow: ${{ github.workflow }}
-          slack_thread_ts: ${{ steps.notify_start.outputs.slack-thread-ts }}
+          slack_thread_ts: ${{ needs.notify_test_start.outputs.slackThreadTs }}
 
-      - name: Send Slack notification (failure)
+      - name: Send Slack notification (test failure)
         if: failure()
-        id: notify_failure
+        id: notify_test_failure
         uses: ./actions/yml/slack
         with:
           slack-token: ${{ secrets.SLACK_TOKEN }}
@@ -73,11 +93,11 @@ jobs:
           ref: ${{ github.ref }}
           event-name: ${{ github.event_name }}
           workflow: ${{ github.workflow }}
-          slack_thread_ts: ${{ steps.notify_start.outputs.slack-thread-ts }}
+          slack_thread_ts: ${{ needs.notify_test_start.outputs.slackThreadTs }}
 
-      - name: Send Slack notification (cancelled)
+      - name: Send Slack notification (test cancelled)
         if: cancelled()
-        id: notify_cancelled
+        id: notify_test_cancelled
         uses: ./actions/yml/slack
         with:
           slack-token: ${{ secrets.SLACK_TOKEN }}
@@ -89,4 +109,4 @@ jobs:
           ref: ${{ github.ref }}
           event-name: ${{ github.event_name }}
           workflow: ${{ github.workflow }}
-          slack_thread_ts: ${{ steps.notify_start.outputs.slack-thread-ts }}
+          slack_thread_ts: ${{ needs.notify_test_start.outputs.slackThreadTs }}
