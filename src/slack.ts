@@ -152,9 +152,21 @@ const run = async (): Promise<void> => {
         attachments,
         threadTs
       );
+    } else if (status === "cancelled") {
+      const attachments = [
+        {
+          pretext: `Job ${jobName} with run ID ${runId} has cancelled.`,
+          color: attachment.color,
+          fields: attachment.fields,
+        },
+      ];
+      await sendOrUpdateSlackNotification(
+        token,
+        channel,
+        attachments,
+        threadTs
+      );
     }
-
-    console.log(core.getState("slack-thread-ts"));
   } catch (error) {
     core.setFailed(`Action failed with error: ${(error as Error).message}`);
   }
