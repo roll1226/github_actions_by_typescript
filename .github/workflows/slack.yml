@@ -41,6 +41,7 @@ jobs:
           ref: ${{ github.ref }}
           event-name: ${{ github.event_name }}
           workflow: ${{ github.workflow }}
+          slack_thread_ts: ""
 
   test:
     runs-on: ubuntu-latest
