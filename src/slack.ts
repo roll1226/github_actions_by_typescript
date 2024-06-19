@@ -108,65 +108,33 @@ const run = async (): Promise<void> => {
       workflow,
       runId
     );
+
+    const attachments: SlackAttachment[] = [
+      {
+        pretext: ``,
+        color: attachment.color,
+        fields: attachment.fields,
+      },
+    ];
+
     if (status === "start") {
-      const attachments: SlackAttachment[] = [
-        {
-          pretext: `Job ${jobName} with run ID ${runId} has started.`,
-          color: attachment.color,
-          fields: attachment.fields,
-        },
-      ];
-      threadTs = await sendOrUpdateSlackNotification(
-        token,
-        channel,
-        attachments
-      );
-      if (threadTs) {
-        core.setOutput("slack-thread-ts", threadTs);
-      }
+      attachments[0].pretext = `Job ${jobName} with run ID ${runId} has started.`;
     } else if (status === "success") {
-      const attachments = [
-        {
-          pretext: `Job ${jobName} with run ID ${runId} has succeeded.`,
-          color: attachment.color,
-          fields: attachment.fields,
-        },
-      ];
-      await sendOrUpdateSlackNotification(
-        token,
-        channel,
-        attachments,
-        threadTs
-      );
+      attachments[0].pretext = `Job ${jobName} with run ID ${runId} has succeeded.`;
     } else if (status === "failure") {
-      const attachments = [
-        {
-          pretext: `Job ${jobName} with run ID ${runId} has failed.`,
-          color: attachment.color,
-          fields: attachment.fields,
-        },
-      ];
-      await sendOrUpdateSlackNotification(
-        token,
-        channel,
-        attachments,
-        threadTs
-      );
+      attachments[0].pretext = `Job ${jobName} with run ID ${runId} has failed.`;
     } else if (status === "cancelled") {
-      const attachments = [
-        {
-          pretext: `Job ${jobName} with run ID ${runId} has cancelled.`,
-          color: attachment.color,
-          fields: attachment.fields,
-        },
-      ];
-      await sendOrUpdateSlackNotification(
-        token,
-        channel,
-        attachments,
-        threadTs
-      );
+      attachments[0].pretext = `Job ${jobName} with run ID ${runId} has cancelled.`;
     }
+
+    threadTs = await sendOrUpdateSlackNotification(
+      token,
+      channel,
+      attachments,
+      threadTs
+    );
+    if (threadTs && status === "start")
+      core.setOutput("slack-thread-ts", threadTs);
   } catch (error) {
     core.setFailed(`Action failed with error: ${(error as Error).message}`);
   }
