@@ -1,46 +1,18 @@
 import * as core from "@actions/core";
 import axios from "axios";
-import { BaseAttachmentFields, baseAttachment } from "./slack/baseAttachment";
+import { baseAttachment } from "./slack/baseAttachment";
 import { JobStatus } from "./slack/jobStatus";
+import {
+  SendOrUpdateSlackNotification,
+  SlackApi,
+  SlackAttachment,
+  SlackPayload,
+} from "./types/slack";
 
 const SLACK_API = {
   POST: "https://slack.com/api/chat.postMessage",
   UPDATE: "https://slack.com/api/chat.update",
 };
-
-type SlackAttachment = {
-  pretext: string;
-  color: string;
-  fields: BaseAttachmentFields[];
-};
-
-type SlackApiProp = {
-  url: string;
-  payload: {
-    channel: string;
-    attachments: SlackAttachment[];
-    ts?: string;
-    token: string;
-  };
-  token: string;
-};
-
-type SlackApiReturn = {
-  data: {
-    ok: boolean;
-    error: string;
-    ts: string;
-  };
-};
-
-type SlackPayload = {
-  channel: string;
-  token: string;
-  attachments: SlackAttachment[];
-  ts?: string;
-};
-
-type SlackApi = ({ url, payload }: SlackApiProp) => Promise<SlackApiReturn>;
 
 const slackApi: SlackApi = async ({ url, payload, token }) => {
   return await axios.post(url, payload, {
@@ -51,12 +23,12 @@ const slackApi: SlackApi = async ({ url, payload, token }) => {
   });
 };
 
-const sendOrUpdateSlackNotification = async (
-  token: string,
-  channel: string,
-  attachments: SlackAttachment[],
-  threadTs?: string
-): Promise<string | undefined> => {
+const sendOrUpdateSlackNotification: SendOrUpdateSlackNotification = async (
+  token,
+  channel,
+  attachments,
+  threadTs
+) => {
   try {
     const slackPayload: SlackPayload = {
       channel,
