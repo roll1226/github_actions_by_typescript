@@ -16,7 +16,7 @@ type SlackAttachment = {
 
 type SlackApiProp = {
   url: string;
-  data: {
+  payload: {
     channel: string;
     attachments: SlackAttachment[];
     ts?: string;
@@ -33,10 +33,17 @@ type SlackApiReturn = {
   };
 };
 
-type SlackApi = ({ url, data }: SlackApiProp) => Promise<SlackApiReturn>;
+type SlackPayload = {
+  channel: string;
+  token: string;
+  attachments: SlackAttachment[];
+  ts?: string;
+};
 
-const slackApi: SlackApi = async ({ url, data, token }) => {
-  return await axios.post(url, data, {
+type SlackApi = ({ url, payload }: SlackApiProp) => Promise<SlackApiReturn>;
+
+const slackApi: SlackApi = async ({ url, payload, token }) => {
+  return await axios.post(url, payload, {
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json; charset=utf-8",
@@ -51,28 +58,19 @@ const sendOrUpdateSlackNotification = async (
   threadTs?: string
 ): Promise<string | undefined> => {
   try {
-    // console.log("Sending payload:", JSON.stringify(payload, null, 2)); // デバッグ用ログ
+    const slackPayload: SlackPayload = {
+      channel,
+      attachments,
+      token,
+    };
 
-    const response = threadTs
-      ? await slackApi({
-          url: SLACK_API.UPDATE,
-          data: {
-            channel,
-            attachments,
-            ts: threadTs,
-            token,
-          },
-          token,
-        })
-      : await slackApi({
-          url: SLACK_API.POST,
-          data: {
-            channel,
-            attachments,
-            token,
-          },
-          token,
-        });
+    if (threadTs) slackPayload.ts = threadTs;
+
+    const response = await slackApi({
+      url: threadTs ? SLACK_API.UPDATE : SLACK_API.POST,
+      payload: slackPayload,
+      token,
+    });
 
     if (response.data.ok) {
       return response.data.ts;
