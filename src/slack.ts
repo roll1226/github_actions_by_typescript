@@ -1,7 +1,7 @@
 import * as core from "@actions/core";
 import axios from "axios";
 import { baseAttachment } from "./slack/baseAttachment";
-import { JobStatus } from "./slack/jobStatus";
+import { JOB_STATUS } from "./slack/jobStatus";
 import {
   SendOrUpdateSlackNotification,
   SlackApi,
@@ -60,7 +60,7 @@ const run = async (): Promise<void> => {
   try {
     const token = core.getInput("slack-token");
     const channel = core.getInput("slack-channel");
-    const status = core.getInput("status") as JobStatus;
+    const status = core.getInput("status") as JOB_STATUS;
     const runId = core.getInput("run-id");
     const jobName = core.getInput("job-name");
     const repository = core.getInput("repository");

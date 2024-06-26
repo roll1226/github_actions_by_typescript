@@ -1,4 +1,4 @@
-import { JobStatus, jobStatus } from "./jobStatus";
+import { JOB_STATUS, jobStatus } from "./jobStatus";
 
 export type BaseAttachmentFields = {
   title: string;
@@ -12,7 +12,7 @@ export type BaseAttachment = {
 };
 
 export const baseAttachment = (
-  status: JobStatus,
+  status: JOB_STATUS,
   repository: string,
   ref: string,
   eventName: string,
