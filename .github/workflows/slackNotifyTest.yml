@@ -19,11 +19,22 @@ jobs:
         with:
           node-version: "18"
 
-      - name: Install dependencies
-        run: npm install
+      - name: Initialize & Build
+        uses: ./actions/yml/build
 
-      - name: Build project
-        run: npm run build
+      - name: Cache node modules
+        id: cache-slack-notify-node-modules
+        uses: actions/cache@v4
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-${{ hashFiles('./package-lock.json') }}
+
+      - name: Cache dist
+        id: cache-slack-notify-dist
+        uses: actions/cache@v4
+        with:
+          path: ./dist
+          key: ${{ runner.os }}-${{ hashFiles('./package-lock.json') }}-dist
 
       - name: Send Slack notification (test start)
         id: notify_test_start
@@ -52,11 +63,8 @@ jobs:
         with:
           node-version: "18"
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run tests
-        run: npm test
+      - name: Initialize & Test
+        uses: ./actions/yml/test
 
   notify_test_success:
     runs-on: ubuntu-latest
@@ -71,11 +79,19 @@ jobs:
         with:
           node-version: "18"
 
-      - name: Install dependencies
-        run: npm install
+      - name: Restore node modules
+        id: cache-slack-notify-node-modules
+        uses: actions/cache@v4
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-${{ hashFiles('./package-lock.json') }}-modules
 
-      - name: Build project
-        run: npm run build
+      - name: Restore dist
+        id: cache-slack-notify-dist
+        uses: actions/cache@v4
+        with:
+          path: ./dist
+          key: ${{ runner.os }}-${{ hashFiles('./package-lock.json') }}-dist
 
       - name: Send Slack notification (test success)
         id: notify_test_success
@@ -105,11 +121,19 @@ jobs:
         with:
           node-version: "18"
 
-      - name: Install dependencies
-        run: npm install
+      - name: Restore node modules
+        id: cache-slack-notify-node-modules
+        uses: actions/cache@v4
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-${{ hashFiles('./package-lock.json') }}-modules
 
-      - name: Build project
-        run: npm run build
+      - name: Restore dist
+        id: cache-slack-notify-dist
+        uses: actions/cache@v4
+        with:
+          path: ./dist
+          key: ${{ runner.os }}-${{ hashFiles('./package-lock.json') }}-dist
 
       - name: Send Slack notification (test failure)
         id: notify_test_failure
@@ -139,11 +163,19 @@ jobs:
         with:
           node-version: "18"
 
-      - name: Install dependencies
-        run: npm install
+      - name: Restore node modules
+        id: cache-slack-notify-node-modules
+        uses: actions/cache@v4
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-${{ hashFiles('./package-lock.json') }}-modules
 
-      - name: Build project
-        run: npm run build
+      - name: Restore dist
+        id: cache-slack-notify-dist
+        uses: actions/cache@v4
+        with:
+          path: ./dist
+          key: ${{ runner.os }}-${{ hashFiles('./package-lock.json') }}-dist
 
       - name: Send Slack notification (test cancelled)
         id: notify_test_cancelled
