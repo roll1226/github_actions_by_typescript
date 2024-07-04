@@ -79,6 +79,9 @@ jobs:
         with:
           node-version: "18"
 
+      - name: Initialize & Build
+        uses: ./actions/yml/build
+
       - name: Restore node modules
         id: cache-slack-notify-node-modules
         uses: actions/cache@v4
@@ -121,6 +124,9 @@ jobs:
         with:
           node-version: "18"
 
+      - name: Initialize & Build
+        uses: ./actions/yml/build
+
       - name: Restore node modules
         id: cache-slack-notify-node-modules
         uses: actions/cache@v4
@@ -162,6 +168,9 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: "18"
+
+      - name: Initialize & Build
+        uses: ./actions/yml/build
 
       - name: Restore node modules
         id: cache-slack-notify-node-modules
