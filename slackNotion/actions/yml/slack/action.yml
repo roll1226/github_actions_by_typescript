@@ -31,4 +31,4 @@ inputs:
     required: true
 runs:
   using: "node20"
-  main: "../../../dist/src/slack.js"
+  main: "../../../dist/slack.js"

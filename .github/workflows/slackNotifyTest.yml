@@ -20,25 +20,25 @@ jobs:
           node-version: "18"
 
       - name: Initialize & Build
-        uses: ./actions/yml/build
+        uses: ./slackNotion/actions/yml/build
 
       - name: Cache node modules
         id: cache-slack-notify-node-modules
         uses: actions/cache@v4
         with:
-          path: ./node_modules
-          key: ${{ runner.os }}-${{ hashFiles('./package-lock.json') }}
+          path: ./slackNotion/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}
 
       - name: Cache dist
         id: cache-slack-notify-dist
         uses: actions/cache@v4
         with:
-          path: ./dist
-          key: ${{ runner.os }}-${{ hashFiles('./package-lock.json') }}-dist
+          path: ./slackNotion/dist
+          key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-dist
 
       - name: Send Slack notification (test start)
         id: notify_test_start
-        uses: ./actions/yml/slack
+        uses: ./slackNotion/actions/yml/slack
         with:
           slack-token: ${{ secrets.SLACK_TOKEN }}
           slack-channel: ${{ secrets.SLACK_CHANNEL }}
@@ -64,7 +64,7 @@ jobs:
           node-version: "18"
 
       - name: Initialize & Test
-        uses: ./actions/yml/test
+        uses: ./slackNotion/actions/yml/test
 
   notify_test_success:
     runs-on: ubuntu-latest
@@ -80,25 +80,25 @@ jobs:
           node-version: "18"
 
       - name: Initialize & Build
-        uses: ./actions/yml/build
+        uses: ./slackNotion/actions/yml/build
 
       - name: Restore node modules
         id: cache-slack-notify-node-modules
         uses: actions/cache@v4
         with:
-          path: ./node_modules
-          key: ${{ runner.os }}-${{ hashFiles('./package-lock.json') }}-modules
+          path: ./slackNotion/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-modules
 
       - name: Restore dist
         id: cache-slack-notify-dist
         uses: actions/cache@v4
         with:
-          path: ./dist
-          key: ${{ runner.os }}-${{ hashFiles('./package-lock.json') }}-dist
+          path: ./slackNotion/dist
+          key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-dist
 
       - name: Send Slack notification (test success)
         id: notify_test_success
-        uses: ./actions/yml/slack
+        uses: ./slackNotion/actions/yml/slack
         with:
           slack-token: ${{ secrets.SLACK_TOKEN }}
           slack-channel: ${{ secrets.SLACK_CHANNEL }}
@@ -125,14 +125,14 @@ jobs:
           node-version: "18"
 
       - name: Initialize & Build
-        uses: ./actions/yml/build
+        uses: ./slackNotion/actions/yml/build
 
       - name: Restore node modules
         id: cache-slack-notify-node-modules
         uses: actions/cache@v4
         with:
-          path: ./node_modules
-          key: ${{ runner.os }}-${{ hashFiles('./package-lock.json') }}-modules
+          path: ./slackNotion/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-modules
 
       - name: Restore dist
         id: cache-slack-notify-dist
@@ -143,7 +143,7 @@ jobs:
 
       - name: Send Slack notification (test failure)
         id: notify_test_failure
-        uses: ./actions/yml/slack
+        uses: ./slackNotion/actions/yml/slack
         with:
           slack-token: ${{ secrets.SLACK_TOKEN }}
           slack-channel: ${{ secrets.SLACK_CHANNEL }}
@@ -170,14 +170,14 @@ jobs:
           node-version: "18"
 
       - name: Initialize & Build
-        uses: ./actions/yml/build
+        uses: ./slackNotion/actions/yml/build
 
       - name: Restore node modules
         id: cache-slack-notify-node-modules
         uses: actions/cache@v4
         with:
-          path: ./node_modules
-          key: ${{ runner.os }}-${{ hashFiles('./package-lock.json') }}-modules
+          path: ./slackNotion/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-modules
 
       - name: Restore dist
         id: cache-slack-notify-dist
@@ -188,7 +188,7 @@ jobs:
 
       - name: Send Slack notification (test cancelled)
         id: notify_test_cancelled
-        uses: ./actions/yml/slack
+        uses: ./slackNotion/actions/yml/slack
         with:
           slack-token: ${{ secrets.SLACK_TOKEN }}
           slack-channel: ${{ secrets.SLACK_CHANNEL }}
