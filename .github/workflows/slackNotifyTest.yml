@@ -64,7 +64,7 @@ jobs:
           node-version: "18"
 
       - name: Initialize & Test
-        uses: ./slackNotion/actions/yml/test
+        uses: ./.github/workflows/actions/tests
 
   notify_test_success:
     runs-on: ubuntu-latest
