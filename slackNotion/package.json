@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/slack.js",
+    "start": "ts-node --files src/slack.ts",
     "test": "jest"
   },
   "keywords": [],

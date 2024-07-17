@@ -58,17 +58,17 @@ const sendOrUpdateSlackNotification: SendOrUpdateSlackNotification = async (
 
 const run = async (): Promise<void> => {
   try {
-    const token = core.getInput("slack-token");
-    const channel = core.getInput("slack-channel");
-    const status = core.getInput("status") as JOB_STATUS;
-    const runId = core.getInput("run-id");
-    const jobName = core.getInput("job-name");
-    const repository = core.getInput("repository");
-    const ref = core.getInput("ref");
-    const eventName = core.getInput("event-name");
-    const workflow = core.getInput("workflow");
-
-    let threadTs: string | undefined = core.getInput("slack_thread_ts");
+    const env = process.env;
+    const token = env.SLACK_TOKEN;
+    const channel = env.SLACK_CHANNEL;
+    const status = env.STATUS;
+    const runId = env.RUN_ID;
+    const jobName = env.JOB_NAME;
+    const repository = env.REPOSITORY;
+    const ref = env.REF;
+    const eventName = env.EVENT_NAME;
+    const workflow = env.WORKFLOW;
+    const targetThreadTs = env.SLACK_THREAD_TS;
 
     const attachment = baseAttachment(
       status,
@@ -87,24 +87,17 @@ const run = async (): Promise<void> => {
       },
     ];
 
-    if (status === "start") {
-      attachments[0].pretext = `Job ${jobName} with run ID ${runId} has started.`;
-    } else if (status === "success") {
-      attachments[0].pretext = `Job ${jobName} with run ID ${runId} has succeeded.`;
-    } else if (status === "failure") {
-      attachments[0].pretext = `Job ${jobName} with run ID ${runId} has failed.`;
-    } else if (status === "cancelled") {
-      attachments[0].pretext = `Job ${jobName} with run ID ${runId} has cancelled.`;
-    }
+    attachments[0].pretext = `Job ${jobName} with run ID ${runId} has ${status}.`;
 
-    threadTs = await sendOrUpdateSlackNotification(
+    const threadTs = await sendOrUpdateSlackNotification(
       token,
       channel,
       attachments,
-      threadTs
+      targetThreadTs
     );
-    if (threadTs && status === "start")
-      core.setOutput("slack-thread-ts", threadTs);
+
+    if (threadTs && status === JOB_STATUS.START)
+      core.setOutput("SLACK_THREAD_TS", threadTs);
   } catch (error) {
     core.setFailed(`Action failed with error: ${(error as Error).message}`);
   }

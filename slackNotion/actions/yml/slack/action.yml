@@ -1,34 +1,54 @@
 name: "Slack Notification Action"
 description: "Sends or updates a notification in Slack"
-author: "Your Name"
+author: "roll1226"
 inputs:
-  slack-token:
+  SLACK_TOKEN:
     description: "The Slack OAuth token"
     required: true
-  slack-channel:
+  SLACK_CHANNEL:
     description: "The Slack channel ID"
     required: true
-  status:
-    description: "The status of the workflow"
+  STATUS:
+    description: "The Status of the workflow"
     required: true
-  run-id:
+  RUN_ID:
     description: "The GitHub Actions run ID"
     required: true
-  job-name:
+  JOB_NAME:
     description: "The GitHub Actions job name"
     required: true
-  repository:
-    description: "The GitHub repository name"
+  REPOSITORY:
+    description: "The GitHub Repository name"
     required: true
-  ref:
-    description: "The GitHub ref"
+  REF:
+    description: "The GitHub Ref"
     required: true
-  event-name:
+  EVENT_NAME:
     description: "The GitHub event name"
     required: true
-  workflow:
-    description: "The GitHub workflow name"
+  WORKFLOW:
+    description: "The GitHub Workflow name"
     required: true
+  SLACK_THREAD_TS:
+    description: "The Slack Message Timestamp"
+    required: false
+  outputs:
+    SLACK_THREAD_TS:
+      description: "Slack Timestamp"
 runs:
-  using: "node20"
-  main: "../../../dist/slack.js"
+  using: "composite"
+  steps:
+    - name: Run Script
+      run: cd slackNotion && npm run start
+      shell: bash
+      env:
+        SLACK_TOKEN: ${{ inputs.SLACK_TOKEN }}
+        SLACK_CHANNEL: ${{ inputs.SLACK_CHANNEL }}
+        STATUS: ${{ inputs.STATUS }}
+        RUN_ID: ${{ inputs.RUN_ID }}
+        JOB_NAME: ${{ inputs.JOB_NAME }}
+        REPOSITORY: ${{ inputs.REPOSITORY }}
+        REF: ${{ inputs.REF }}
+        EVENT_NAME: ${{ inputs.EVENT_NAME }}
+        WORKFLOW: ${{ inputs.WORKFLOW }}
+        SLACK_THREAD_TS: ${{ inputs.SLACK_THREAD_TS }}

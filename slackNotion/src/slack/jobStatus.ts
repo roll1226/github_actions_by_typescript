@@ -1,22 +1,22 @@
 export const JOB_STATUS = {
-  START: "start",
-  SUCCESS: "success",
-  FAILURE: "failure",
+  START: "started",
+  SUCCESS: "succeeded",
+  FAILURE: "failed",
   CANCELLED: "cancelled",
 } as const;
 export type JOB_STATUS = (typeof JOB_STATUS)[keyof typeof JOB_STATUS];
 
 export const jobStatus: Record<JOB_STATUS, { color: string; result: string }> =
   {
-    start: {
+    started: {
       color: "#3ea8ff",
       result: "Start",
     },
-    success: {
+    succeeded: {
       color: "#2cbe4e",
       result: "Succeeded",
     },
-    failure: {
+    failed: {
       color: "#cb2431",
       result: "Failed",
     },
