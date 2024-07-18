@@ -32,11 +32,11 @@ inputs:
   SLACK_THREAD_TS:
     description: "The Slack Message Timestamp"
     required: false
+runs:
+  using: "composite"
   outputs:
     SLACK_THREAD_TS:
       description: "Slack Timestamp"
-runs:
-  using: "composite"
   steps:
     - name: Run Script
       run: cd slackNotion && npm run start
