@@ -19,23 +19,6 @@ jobs:
         with:
           node-version: "18"
 
-      - name: Build notification
-        uses: ./slackNotion/actions/yml/build
-
-      - name: Cache node modules
-        id: cache-slack-notify-node-modules
-        uses: actions/cache@v4
-        with:
-          path: ./slackNotion/node_modules
-          key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-modules
-
-      - name: Cache dist
-        id: cache-slack-notify-dist
-        uses: actions/cache@v4
-        with:
-          path: ./slackNotion/dist
-          key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-dist
-
       - name: Send Slack notification (test start)
         id: notify_test_start
         uses: ./slackNotion/actions/yml/slack

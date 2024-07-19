@@ -38,6 +38,14 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: Install dependencies
+      run: cd slackNotion && npm ci
+      shell: bash
+
+    - name: Compile TypeScript
+      run: cd slackNotion && npm run build
+      shell: bash
+
     - name: Run Script
       run: cd slackNotion && npm run start
       shell: bash
