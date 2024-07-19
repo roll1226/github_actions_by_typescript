@@ -1,11 +1,9 @@
 import * as core from "@actions/core";
 import axios from "axios";
-import { baseAttachment } from "./slack/baseAttachment";
 import { JOB_STATUS } from "./slack/jobStatus";
 import {
   SendOrUpdateSlackNotification,
   SlackApi,
-  SlackAttachment,
   SlackPayload,
 } from "./types/slack";
 
@@ -57,49 +55,62 @@ const sendOrUpdateSlackNotification: SendOrUpdateSlackNotification = async (
 };
 
 const run = async (): Promise<void> => {
-  try {
-    const token = core.getInput("SLACK_TOKEN");
-    const channel = core.getInput("SLACK_CHANNEL");
-    const status = core.getInput("STATUS") as JOB_STATUS;
-    const runId = core.getInput("RUN_ID");
-    const jobName = core.getInput("JOB_NAME");
-    const repository = core.getInput("REPOSITORY");
-    const ref = core.getInput("REF");
-    const eventName = core.getInput("EVENT_NAME");
-    const workflow = core.getInput("WORKFLOW");
-    const targetThreadTs = core.getInput("SLACK_THREAD_TS");
+  // try {
+  const token = core.getInput("SLACK_TOKEN");
+  const channel = core.getInput("SLACK_CHANNEL");
+  const status = core.getInput("STATUS") as JOB_STATUS;
+  const runId = core.getInput("RUN_ID");
+  const jobName = core.getInput("JOB_NAME");
+  const repository = core.getInput("REPOSITORY");
+  const ref = core.getInput("REF");
+  const eventName = core.getInput("EVENT_NAME");
+  const workflow = core.getInput("WORKFLOW");
+  const targetThreadTs = core.getInput("SLACK_THREAD_TS");
 
-    const attachment = baseAttachment(
-      status,
-      repository,
-      ref,
-      eventName,
-      workflow,
-      runId
-    );
+  console.log(
+    token,
+    channel,
+    status,
+    runId,
+    jobName,
+    repository,
+    ref,
+    eventName,
+    workflow,
+    targetThreadTs
+  );
 
-    const attachments: SlackAttachment[] = [
-      {
-        pretext: ``,
-        color: attachment.color,
-        fields: attachment.fields,
-      },
-    ];
+  //   const attachment = baseAttachment(
+  //     status,
+  //     repository,
+  //     ref,
+  //     eventName,
+  //     workflow,
+  //     runId
+  //   );
 
-    attachments[0].pretext = `Job ${jobName} with run ID ${runId} has ${status}.`;
+  //   const attachments: SlackAttachment[] = [
+  //     {
+  //       pretext: ``,
+  //       color: attachment.color,
+  //       fields: attachment.fields,
+  //     },
+  //   ];
 
-    const threadTs = await sendOrUpdateSlackNotification(
-      token,
-      channel,
-      attachments,
-      targetThreadTs
-    );
+  //   attachments[0].pretext = `Job ${jobName} with run ID ${runId} has ${status}.`;
 
-    if (threadTs && status === JOB_STATUS.START)
-      core.setOutput("SLACK_THREAD_TS", threadTs);
-  } catch (error) {
-    core.setFailed(`Action failed with error: ${(error as Error).message}`);
-  }
+  //   const threadTs = await sendOrUpdateSlackNotification(
+  //     token,
+  //     channel,
+  //     attachments,
+  //     targetThreadTs
+  //   );
+
+  //   if (threadTs && status === JOB_STATUS.START)
+  //     core.setOutput("SLACK_THREAD_TS", threadTs);
+  // } catch (error) {
+  //   core.setFailed(`Action failed with error: ${(error as Error).message}`);
+  // }
 };
 
 run();
