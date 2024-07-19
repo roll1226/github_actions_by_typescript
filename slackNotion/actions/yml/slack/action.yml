@@ -1,6 +1,5 @@
 name: "Slack Notification Action"
 description: "Sends or updates a notification in Slack"
-author: "roll1226"
 inputs:
   SLACK_TOKEN:
     description: "The Slack OAuth token"
@@ -32,9 +31,6 @@ inputs:
   SLACK_THREAD_TS:
     description: "The Slack Message Timestamp"
     required: false
-outputs:
-  SLACK_THREAD_TS:
-    description: "Slack Timestamp"
 runs:
   using: "composite"
   steps:
