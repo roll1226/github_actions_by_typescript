@@ -1,34 +1,34 @@
 name: "Slack Notification Action"
 description: "Sends or updates a notification in Slack"
 inputs:
-  SLACK_TOKEN:
+  slack-token:
     description: "The Slack OAuth token"
     required: true
-  SLACK_CHANNEL:
+  slack-channel:
     description: "The Slack channel ID"
     required: true
-  STATUS:
+  status:
     description: "The Status of the workflow"
     required: true
-  RUN_ID:
+  run-id:
     description: "The GitHub Actions run ID"
     required: true
-  JOB_NAME:
+  job-name:
     description: "The GitHub Actions job name"
     required: true
-  REPOSITORY:
+  repository:
     description: "The GitHub Repository name"
     required: true
-  REF:
+  ref:
     description: "The GitHub Ref"
     required: true
-  EVENT_NAME:
+  event-name:
     description: "The GitHub event name"
     required: true
-  WORKFLOW:
+  workflow:
     description: "The GitHub Workflow name"
     required: true
-  SLACK_THREAD_TS:
+  slack-thread-ts:
     description: "The Slack Message Timestamp"
     required: false
 runs:
