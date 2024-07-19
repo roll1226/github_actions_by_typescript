@@ -22,7 +22,7 @@ export const baseAttachment = (
   const jobUrl = `https://github.com/${repository}/actions/runs/${runId}`;
 
   return {
-    color: jobStatus[status].color,
+    color: jobStatus["started"].color,
     fields: [
       { title: "Repository", value: repository, short: true },
       { title: "Ref", value: ref, short: true },
