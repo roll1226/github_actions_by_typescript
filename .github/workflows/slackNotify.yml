@@ -19,19 +19,8 @@ jobs:
         with:
           node-version: "18"
 
-      - name: Send Slack notification (test start)
-        id: notify_test_start
-        uses: ./slackNotion/actions/yml/slack
-        with:
-          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
-          SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
-          STATUS: "started"
-          RUN_ID: ${{ github.run_id }}
-          JOB_NAME: ${{ github.job }}
-          REPOSITORY: ${{ github.repository }}
-          REF: ${{ github.ref }}
-          EVENT_NAME: ${{ github.event_name }}
-          WORKFLOW: ${{ github.workflow }}
+      - name: Build notification
+        uses: ./slackNotion/actions/yml/build
 
       - name: Cache node modules
         id: cache-slack-notify-node-modules
@@ -46,6 +35,20 @@ jobs:
         with:
           path: ./slackNotion/dist
           key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-dist
+
+      - name: Send Slack notification (test start)
+        id: notify_test_start
+        uses: ./slackNotion/actions/yml/slack
+        with:
+          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+          SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
+          STATUS: "started"
+          RUN_ID: ${{ github.run_id }}
+          JOB_NAME: ${{ github.job }}
+          REPOSITORY: ${{ github.repository }}
+          REF: ${{ github.ref }}
+          EVENT_NAME: ${{ github.event_name }}
+          WORKFLOW: ${{ github.workflow }}
 
       - name: Check outputs
         run: |
