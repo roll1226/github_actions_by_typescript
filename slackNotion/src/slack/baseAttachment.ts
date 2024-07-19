@@ -1,4 +1,4 @@
-import { JOB_STATUS, jobStatus } from "./jobStatus";
+import { JOB_STATUS } from "./jobStatus";
 
 export type BaseAttachmentFields = {
   title: string;
@@ -22,7 +22,7 @@ export const baseAttachment = (
   const jobUrl = `https://github.com/${repository}/actions/runs/${runId}`;
 
   return {
-    color: jobStatus["started"].color,
+    color: "#3ea8ff",
     fields: [
       { title: "Repository", value: repository, short: true },
       { title: "Ref", value: ref, short: true },
