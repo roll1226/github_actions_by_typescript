@@ -82,13 +82,11 @@ async function run() {
 
     const attachments: SlackAttachment[] = [
       {
-        pretext: ``,
+        pretext: `Job ${jobName} with run ID ${runId} has ${status}.`,
         color: attachment.color,
         fields: attachment.fields,
       },
     ];
-
-    attachments[0].pretext = `Job ${jobName} with run ID ${runId} has ${status}.`;
 
     const threadTs = await sendOrUpdateSlackNotification(
       slackToken,
