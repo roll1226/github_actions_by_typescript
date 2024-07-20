@@ -13,5 +13,5 @@ jobs:
         with:
           node-version: "18"
 
-      - name: Initialize & Test
+      - name: Initialize & Tests
         uses: ./.github/workflows/actions/tests
