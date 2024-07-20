@@ -37,143 +37,143 @@ jobs:
         run: |
           echo ${{steps.notify_test_start.outputs.SLACK_THREAD_TS}}
 
-  test:
-    runs-on: ubuntu-latest
-    needs: notify_test_start
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+  # test:
+  #   runs-on: ubuntu-latest
+  #   needs: notify_test_start
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: "18"
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v2
+  #       with:
+  #         node-version: "18"
 
-      - name: Initialize & Test
-        uses: ./.github/workflows/actions/tests
+  #     - name: Initialize & Test
+  #       uses: ./.github/workflows/actions/tests
 
-  notify_test_success:
-    runs-on: ubuntu-latest
-    needs: [test, notify_test_start]
-    if: success()
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+  # notify_test_success:
+  #   runs-on: ubuntu-latest
+  #   needs: [test, notify_test_start]
+  #   if: success()
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: "18"
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v2
+  #       with:
+  #         node-version: "18"
 
-      - name: Restore node modules
-        id: cache-slack-notify-node-modules
-        uses: actions/cache@v4
-        with:
-          path: ./slackNotion/node_modules
-          key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-modules
+  #     - name: Restore node modules
+  #       id: cache-slack-notify-node-modules
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: ./slackNotion/node_modules
+  #         key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-modules
 
-      - name: Restore dist
-        id: cache-slack-notify-dist
-        uses: actions/cache@v4
-        with:
-          path: ./slackNotion/dist
-          key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-dist
+  #     - name: Restore dist
+  #       id: cache-slack-notify-dist
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: ./slackNotion/dist
+  #         key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-dist
 
-      - name: Send Slack notification (test success)
-        id: notify_test_success
-        uses: ./slackNotion/actions/yml/slack
-        with:
-          slack-token: ${{ secrets.SLACK_TOKEN }}
-          slack-channel: ${{ secrets.SLACK_CHANNEL }}
-          status: "succeeded"
-          run-id: ${{ github.run_id }}
-          job-name: ${{ github.job }}
-          repository: ${{ github.repository }}
-          ref: ${{ github.ref }}
-          event-name: ${{ github.event_name }}
-          workflow: ${{ github.workflow }}
-          slack-thread-ts: ${{ needs.notify_test_start.outputs.SLACK_THREAD_TS }}
+  #     - name: Send Slack notification (test success)
+  #       id: notify_test_success
+  #       uses: ./slackNotion/actions/yml/slack
+  #       with:
+  #         slack-token: ${{ secrets.SLACK_TOKEN }}
+  #         slack-channel: ${{ secrets.SLACK_CHANNEL }}
+  #         status: "succeeded"
+  #         run-id: ${{ github.run_id }}
+  #         job-name: ${{ github.job }}
+  #         repository: ${{ github.repository }}
+  #         ref: ${{ github.ref }}
+  #         event-name: ${{ github.event_name }}
+  #         workflow: ${{ github.workflow }}
+  #         slack-thread-ts: ${{ needs.notify_test_start.outputs.SLACK_THREAD_TS }}
 
-  notify_test_failure:
-    runs-on: ubuntu-latest
-    needs: [test, notify_test_start]
-    if: failure()
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+  # notify_test_failure:
+  #   runs-on: ubuntu-latest
+  #   needs: [test, notify_test_start]
+  #   if: failure()
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: "18"
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v2
+  #       with:
+  #         node-version: "18"
 
-      - name: Restore node modules
-        id: cache-slack-notify-node-modules
-        uses: actions/cache@v4
-        with:
-          path: ./slackNotion/node_modules
-          key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-modules
+  #     - name: Restore node modules
+  #       id: cache-slack-notify-node-modules
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: ./slackNotion/node_modules
+  #         key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-modules
 
-      - name: Restore dist
-        id: cache-slack-notify-dist
-        uses: actions/cache@v4
-        with:
-          path: ./dist
-          key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-dist
+  #     - name: Restore dist
+  #       id: cache-slack-notify-dist
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: ./dist
+  #         key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-dist
 
-      - name: Send Slack notification (test failure)
-        id: notify_test_failure
-        uses: ./slackNotion/actions/yml/slack
-        with:
-          slack-token: ${{ secrets.SLACK_TOKEN }}
-          slack-channel: ${{ secrets.SLACK_CHANNEL }}
-          status: "failed"
-          run-id: ${{ github.run_id }}
-          job-name: ${{ github.job }}
-          repository: ${{ github.repository }}
-          ref: ${{ github.ref }}
-          event-name: ${{ github.event_name }}
-          workflow: ${{ github.workflow }}
-          slack-thread-ts: ${{ needs.notify_test_start.outputs.SLACK_THREAD_TS }}
+  #     - name: Send Slack notification (test failure)
+  #       id: notify_test_failure
+  #       uses: ./slackNotion/actions/yml/slack
+  #       with:
+  #         slack-token: ${{ secrets.SLACK_TOKEN }}
+  #         slack-channel: ${{ secrets.SLACK_CHANNEL }}
+  #         status: "failed"
+  #         run-id: ${{ github.run_id }}
+  #         job-name: ${{ github.job }}
+  #         repository: ${{ github.repository }}
+  #         ref: ${{ github.ref }}
+  #         event-name: ${{ github.event_name }}
+  #         workflow: ${{ github.workflow }}
+  #         slack-thread-ts: ${{ needs.notify_test_start.outputs.SLACK_THREAD_TS }}
 
-  notify_test_cancelled:
-    runs-on: ubuntu-latest
-    needs: [test, notify_test_start]
-    if: cancelled()
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+  # notify_test_cancelled:
+  #   runs-on: ubuntu-latest
+  #   needs: [test, notify_test_start]
+  #   if: cancelled()
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: "18"
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v2
+  #       with:
+  #         node-version: "18"
 
-      - name: Restore node modules
-        id: cache-slack-notify-node-modules
-        uses: actions/cache@v4
-        with:
-          path: ./slackNotion/node_modules
-          key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-modules
+  #     - name: Restore node modules
+  #       id: cache-slack-notify-node-modules
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: ./slackNotion/node_modules
+  #         key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-modules
 
-      - name: Restore dist
-        id: cache-slack-notify-dist
-        uses: actions/cache@v4
-        with:
-          path: ./dist
-          key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-dist
+  #     - name: Restore dist
+  #       id: cache-slack-notify-dist
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: ./dist
+  #         key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-dist
 
-      - name: Send Slack notification (test cancelled)
-        id: notify_test_cancelled
-        uses: ./slackNotion/actions/yml/slack
-        with:
-          slack-token: ${{ secrets.SLACK_TOKEN }}
-          slack-channel: ${{ secrets.SLACK_CHANNEL }}
-          status: "cancelled"
-          run-id: ${{ github.run_id }}
-          job-name: ${{ github.job }}
-          repository: ${{ github.repository }}
-          ref: ${{ github.ref }}
-          event-name: ${{ github.event_name }}
-          workflow: ${{ github.workflow }}
-          slack-thread-ts: ${{ needs.notify_test_start.outputs.SLACK_THREAD_TS }}
+  #     - name: Send Slack notification (test cancelled)
+  #       id: notify_test_cancelled
+  #       uses: ./slackNotion/actions/yml/slack
+  #       with:
+  #         slack-token: ${{ secrets.SLACK_TOKEN }}
+  #         slack-channel: ${{ secrets.SLACK_CHANNEL }}
+  #         status: "cancelled"
+  #         run-id: ${{ github.run_id }}
+  #         job-name: ${{ github.job }}
+  #         repository: ${{ github.repository }}
+  #         ref: ${{ github.ref }}
+  #         event-name: ${{ github.event_name }}
+  #         workflow: ${{ github.workflow }}
+  #         slack-thread-ts: ${{ needs.notify_test_start.outputs.SLACK_THREAD_TS }}

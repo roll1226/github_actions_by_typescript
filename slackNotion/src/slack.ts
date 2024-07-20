@@ -80,6 +80,8 @@ const run = async (): Promise<void> => {
       targetThreadTs
     );
 
+    core.debug(`Hello ${eventName} from inside a container`);
+
     //   const attachment = baseAttachment(
     //     status,
     //     repository,
