@@ -29,12 +29,12 @@ jobs:
           path: ./slackNotion/node_modules
           key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-modules
 
-      # - name: Cache dist
-      #   id: cache-slack-notify-dist
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: ./slackNotion/dist
-      #     key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-dist
+      - name: Cache dist
+        id: cache-slack-notify-dist
+        uses: actions/cache@v4
+        with:
+          path: ./slackNotion/dist
+          key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-dist
 
       - name: Send Slack notification (test start)
         id: notify_test_start
@@ -85,12 +85,12 @@ jobs:
           path: ./slackNotion/node_modules
           key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-modules
 
-      # - name: Restore dist
-      #   id: cache-slack-notify-dist
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: ./slackNotion/dist
-      #     key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-dist
+      - name: Restore dist
+        id: cache-slack-notify-dist
+        uses: actions/cache@v4
+        with:
+          path: ./slackNotion/dist
+          key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-dist
 
       - name: Send Slack notification (test success)
         id: notify_test_success
@@ -130,12 +130,12 @@ jobs:
           path: ./slackNotion/node_modules
           key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-modules
 
-      # - name: Restore dist
-      #   id: cache-slack-notify-dist
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: ./dist
-      #     key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-dist
+      - name: Restore dist
+        id: cache-slack-notify-dist
+        uses: actions/cache@v4
+        with:
+          path: ./dist
+          key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-dist
 
       - name: Send Slack notification (test failure)
         id: notify_test_failure
@@ -172,12 +172,12 @@ jobs:
           path: ./slackNotion/node_modules
           key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-modules
 
-      # - name: Restore dist
-      #   id: cache-slack-notify-dist
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: ./dist
-      #     key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-dist
+      - name: Restore dist
+        id: cache-slack-notify-dist
+        uses: actions/cache@v4
+        with:
+          path: ./dist
+          key: ${{ runner.os }}-${{ hashFiles('./slackNotion/package-lock.json') }}-dist
 
       - name: Send Slack notification (test cancelled)
         id: notify_test_cancelled
