@@ -1,36 +1,36 @@
-name: 'Slack Notification Action'
-description: 'Sends a notification to Slack using a token and outputs the message thread timestamp'
+name: "Slack Notification Action"
+description: "Sends a notification to Slack using a token and outputs the message thread timestamp"
 inputs:
   slack-token:
-    description: 'The Slack OAuth token'
+    description: "The Slack OAuth token"
     required: true
   slack-channel:
-    description: 'The Slack channel ID'
+    description: "The Slack channel ID"
     required: true
   status:
-    description: 'The Status of the workflow'
+    description: "The Status of the workflow"
     required: true
   run-id:
-    description: 'The GitHub Actions run ID'
+    description: "The GitHub Actions run ID"
     required: true
   job-name:
-    description: 'The GitHub Actions job name'
+    description: "The GitHub Actions job name"
     required: true
   repository:
-    description: 'The GitHub Repository name'
+    description: "The GitHub Repository name"
     required: true
   ref:
-    description: 'The GitHub Ref'
+    description: "The GitHub Ref"
     required: true
   event-name:
-    description: 'The GitHub event name'
+    description: "The GitHub event name"
     required: true
   workflow:
-    description: 'The GitHub Workflow name'
+    description: "The GitHub Workflow name"
     required: true
 outputs:
   slack-thread-ts:
-    description: 'The Slack message thread timestamp'
+    description: "The Slack message thread timestamp"
 runs:
-  using: 'node12'
-  main: 'dist/index.js'
+  using: "node12"
+  main: "../../../dist/index.js"
