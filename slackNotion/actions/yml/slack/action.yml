@@ -33,4 +33,4 @@ outputs:
     description: "The Slack message thread timestamp"
 runs:
   using: "node12"
-  main: "../../../dist/index.js"
+  main: "../../../dist/slack.js"
