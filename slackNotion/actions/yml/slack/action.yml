@@ -32,5 +32,5 @@ outputs:
   slack-thread-ts:
     description: "The Slack message thread timestamp"
 runs:
-  using: "node12"
+  using: "node20"
   main: "../../../dist/slack.js"
