@@ -67,20 +67,9 @@ const run = async (): Promise<void> => {
     const workflow = core.getInput("workflow");
     const targetThreadTs = core.getInput("slack-thread-ts");
 
-    console.log(
-      token,
-      channel,
-      status,
-      runId,
-      jobName,
-      repository,
-      ref,
-      eventName,
-      workflow,
-      targetThreadTs
-    );
+    console.log(core);
 
-    core.debug(`Hello ${eventName} from inside a container`);
+    console.log(`Hello ${eventName} from inside a container`);
 
     //   const attachment = baseAttachment(
     //     status,
