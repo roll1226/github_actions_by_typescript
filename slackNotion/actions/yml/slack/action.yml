@@ -32,5 +32,8 @@ outputs:
   slack-thread-ts:
     description: "The Slack message thread timestamp"
 runs:
-  using: "node12"
-  main: "../../../dist/slack.js"
+  using: "Composite"
+  steps:
+    - name: Compile TypeScript
+      run: cd slackNotion && npm run start
+      shell: bash
