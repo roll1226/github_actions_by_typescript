@@ -56,16 +56,16 @@ const sendOrUpdateSlackNotification: SendOrUpdateSlackNotification = async (
 
 const run = async (): Promise<void> => {
   try {
-    const token = core.getInput("SLACK_TOKEN");
-    const channel = core.getInput("SLACK_CHANNEL");
-    const status = core.getInput("STATUS") as JOB_STATUS;
-    const runId = core.getInput("RUN_ID");
-    const jobName = core.getInput("JOB_NAME");
-    const repository = core.getInput("REPOSITORY");
-    const ref = core.getInput("REF");
-    const eventName = core.getInput("EVENT_NAME");
-    const workflow = core.getInput("WORKFLOW");
-    const targetThreadTs = core.getInput("SLACK_THREAD_TS");
+    const token = core.getInput("slack-token");
+    const channel = core.getInput("slack-channel");
+    const status = core.getInput("status") as JOB_STATUS;
+    const runId = core.getInput("run-id");
+    const jobName = core.getInput("job-name");
+    const repository = core.getInput("repository");
+    const ref = core.getInput("ref");
+    const eventName = core.getInput("event-name");
+    const workflow = core.getInput("workflow");
+    const targetThreadTs = core.getInput("slack-thread-ts");
 
     console.log(
       token,

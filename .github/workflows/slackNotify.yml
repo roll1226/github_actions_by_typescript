@@ -23,15 +23,15 @@ jobs:
         id: notify_test_start
         uses: ./slackNotion/actions/yml/slack
         with:
-          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
-          SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
-          STATUS: "started"
-          RUN_ID: ${{ github.run_id }}
-          JOB_NAME: ${{ github.job }}
-          REPOSITORY: ${{ github.repository }}
-          REF: ${{ github.ref }}
-          EVENT_NAME: ${{ github.event_name }}
-          WORKFLOW: ${{ github.workflow }}
+          slack-token: ${{ secrets.SLACK_TOKEN }}
+          slack-channel: ${{ secrets.SLACK_CHANNEL }}
+          status: "started"
+          run-id: ${{ github.run_id }}
+          job-name: ${{ github.job }}
+          repository: ${{ github.repository }}
+          ref: ${{ github.ref }}
+          event-name: ${{ github.event_name }}
+          workflow: ${{ github.workflow }}
 
       - name: Check outputs
         run: |
@@ -83,16 +83,16 @@ jobs:
         id: notify_test_success
         uses: ./slackNotion/actions/yml/slack
         with:
-          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
-          SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
-          STATUS: "succeeded"
-          RUN_ID: ${{ github.run_id }}
-          JOB_NAME: ${{ github.job }}
-          REPOSITORY: ${{ github.repository }}
-          REF: ${{ github.ref }}
-          EVENT_NAME: ${{ github.event_name }}
-          WORKFLOW: ${{ github.workflow }}
-          SLACK_THREAD_TS: ${{ needs.notify_test_start.outputs.SLACK_THREAD_TS }}
+          slack-token: ${{ secrets.SLACK_TOKEN }}
+          slack-channel: ${{ secrets.SLACK_CHANNEL }}
+          status: "succeeded"
+          run-id: ${{ github.run_id }}
+          job-name: ${{ github.job }}
+          repository: ${{ github.repository }}
+          ref: ${{ github.ref }}
+          event-name: ${{ github.event_name }}
+          workflow: ${{ github.workflow }}
+          slack-thread-ts: ${{ needs.notify_test_start.outputs.SLACK_THREAD_TS }}
 
   notify_test_failure:
     runs-on: ubuntu-latest
@@ -125,16 +125,16 @@ jobs:
         id: notify_test_failure
         uses: ./slackNotion/actions/yml/slack
         with:
-          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
-          SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
-          STATUS: "failed"
-          RUN_ID: ${{ github.run_id }}
-          JOB_NAME: ${{ github.job }}
-          REPOSITORY: ${{ github.repository }}
-          REF: ${{ github.ref }}
-          EVENT_NAME: ${{ github.event_name }}
-          WORKFLOW: ${{ github.workflow }}
-          SLACK_THREAD_TS: ${{ needs.notify_test_start.outputs.SLACK_THREAD_TS }}
+          slack-token: ${{ secrets.SLACK_TOKEN }}
+          slack-channel: ${{ secrets.SLACK_CHANNEL }}
+          status: "failed"
+          run-id: ${{ github.run_id }}
+          job-name: ${{ github.job }}
+          repository: ${{ github.repository }}
+          ref: ${{ github.ref }}
+          event-name: ${{ github.event_name }}
+          workflow: ${{ github.workflow }}
+          slack-thread-ts: ${{ needs.notify_test_start.outputs.SLACK_THREAD_TS }}
 
   notify_test_cancelled:
     runs-on: ubuntu-latest
@@ -167,13 +167,13 @@ jobs:
         id: notify_test_cancelled
         uses: ./slackNotion/actions/yml/slack
         with:
-          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
-          SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
-          STATUS: "cancelled"
-          RUN_ID: ${{ github.run_id }}
-          JOB_NAME: ${{ github.job }}
-          REPOSITORY: ${{ github.repository }}
-          REF: ${{ github.ref }}
-          EVENT_NAME: ${{ github.event_name }}
-          WORKFLOW: ${{ github.workflow }}
-          SLACK_THREAD_TS: ${{ needs.notify_test_start.outputs.SLACK_THREAD_TS }}
+          slack-token: ${{ secrets.SLACK_TOKEN }}
+          slack-channel: ${{ secrets.SLACK_CHANNEL }}
+          status: "cancelled"
+          run-id: ${{ github.run_id }}
+          job-name: ${{ github.job }}
+          repository: ${{ github.repository }}
+          ref: ${{ github.ref }}
+          event-name: ${{ github.event_name }}
+          workflow: ${{ github.workflow }}
+          slack-thread-ts: ${{ needs.notify_test_start.outputs.SLACK_THREAD_TS }}
