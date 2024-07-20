@@ -55,20 +55,17 @@ const sendOrUpdateSlackNotification: SendOrUpdateSlackNotification = async (
 };
 
 const run = async (): Promise<void> => {
+  const token = core.getInput("slack-token");
+  const channel = core.getInput("slack-channel");
+  const status = core.getInput("status") as JOB_STATUS;
+  const runId = core.getInput("run-id");
+  const jobName = core.getInput("job-name");
+  const repository = core.getInput("repository");
+  const ref = core.getInput("ref");
+  const eventName = core.getInput("event-name");
+  const workflow = core.getInput("workflow");
+  const targetThreadTs = core.getInput("slack-thread-ts");
   try {
-    const token = core.getInput("slack-token");
-    const channel = core.getInput("slack-channel");
-    const status = core.getInput("status") as JOB_STATUS;
-    const runId = core.getInput("run-id");
-    const jobName = core.getInput("job-name");
-    const repository = core.getInput("repository");
-    const ref = core.getInput("ref");
-    const eventName = core.getInput("event-name");
-    const workflow = core.getInput("workflow");
-    const targetThreadTs = core.getInput("slack-thread-ts");
-
-    console.log(core);
-
     console.log(`Hello ${eventName} from inside a container`);
 
     //   const attachment = baseAttachment(
