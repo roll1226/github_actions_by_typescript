@@ -25,7 +25,7 @@ export const baseAttachment = (
     color: jobStatus[status].color,
     fields: [
       { title: "Repository", value: repository, short: true },
-      { title: "REF", value: ref, short: true },
+      { title: "Ref", value: ref, short: true },
       { title: "Event Name", value: eventName, short: true },
       { title: "Workflow", value: `<${jobUrl}|${workflow}>`, short: true },
     ],
