@@ -67,6 +67,8 @@ const run = async (): Promise<void> => {
     const workflow = core.getInput("workflow");
     const targetThreadTs = core.getInput("slack-thread-ts");
 
+    console.log("huga");
+
     console.log(
       token,
       channel,
