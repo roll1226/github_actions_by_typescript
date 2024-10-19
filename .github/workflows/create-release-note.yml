@@ -1,0 +1,20 @@
+name: Create Release Note
+on:
+  push:
+    branches: [main]
+jobs:
+  release-draft:
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: release-drafter/release-drafter@v6
+        with:
+          config-name: workflows/actions/release-drafter.yml
+          commitish: main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
