@@ -13,5 +13,5 @@ jobs:
         with:
           node-version: "18"
 
-      - name: Initialize & Test
-        uses: ./actions/yml/test
+      - name: Initialize & Tests
+        uses: ./.github/workflows/actions/tests
