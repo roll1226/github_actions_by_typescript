@@ -1,37 +1,79 @@
-name: Create Release Branch and PR
+# name: Create Release Branch and PR
+
+# on:
+#   workflow_dispatch:
+#     inputs:
+#       version:
+#         description: '作成するバージョンを入力してください'
+#         required: true
+
+# jobs:
+#   create_pr:
+#     runs-on: ubuntu-latest
+#     env:
+#       # githubのコンソールから入力したリリース名を環境変数へ保存
+#       RELEASE_BRANCH_NAME: release/${{ github.event.inputs.version }}
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v3
+#       - uses: actions/setup-ruby@v1
+#         with:
+#           ruby-version: 3.1
+#       # releasブランチを作成
+#       - name: Create and push release branch
+#         run: |
+#           git checkout -b ${{ env.RELEASE_BRANCH_NAME }}
+#           git push origin ${{ env.RELEASE_BRANCH_NAME }}
+#       - run: gem install --no-document git-pr-release
+#       # releasブランチ -> mainブランチへのPull Requestを作成
+#       - name: Create PR for release
+#         run: git-pr-release --squash
+#         env:
+#           GIT_PR_RELEASE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#           GIT_PR_RELEASE_BRANCH_PRODUCTION: main
+#           GIT_PR_RELEASE_BRANCH_STAGING: ${{ env.RELEASE_BRANCH_NAME }}
+#           GIT_PR_RELEASE_LABELS: release
+#           GIT_PR_RELEASE_TEMPLATE: pr-release.template.erb
+#           TZ: Asia/Tokyo
+
+name: Create Release Branch
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
-    inputs:
-      version:
-        description: '作成するバージョンを入力してください'
-        required: true
 
 jobs:
-  create_pr:
+  create-release-branch:
     runs-on: ubuntu-latest
-    env:
-      # githubのコンソールから入力したリリース名を環境変数へ保存
-      RELEASE_BRANCH_NAME: release/${{ github.event.inputs.version }}
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      - uses: actions/setup-ruby@v1
-        with:
-          ruby-version: 3.1
-      # releasブランチを作成
-      - name: Create and push release branch
+      # リポジトリをチェックアウト
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      # 現在のバージョンを取得
+      - name: Get Current Version
+        id: version
         run: |
-          git checkout -b ${{ env.RELEASE_BRANCH_NAME }}
-          git push origin ${{ env.RELEASE_BRANCH_NAME }}
-      - run: gem install --no-document git-pr-release
-      # releasブランチ -> mainブランチへのPull Requestを作成
-      - name: Create PR for release
-        run: git-pr-release --squash
+          # バージョン番号を取得 (例: package.json)
+          VERSION=$(jq -r .version package.json)
+          echo "version=$VERSION" >> $GITHUB_ENV
+
+      # リリース用のブランチを作成してプッシュ
+      - name: Create and Push Release Branch
         env:
-          GIT_PR_RELEASE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GIT_PR_RELEASE_BRANCH_PRODUCTION: main
-          GIT_PR_RELEASE_BRANCH_STAGING: ${{ env.RELEASE_BRANCH_NAME }}
-          GIT_PR_RELEASE_LABELS: release
-          GIT_PR_RELEASE_TEMPLATE: pr-release.template.erb
-          TZ: Asia/Tokyo
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          # リリースブランチを作成
+          git checkout -b release/$version
+
+          # 空のコミットを作成 (リリースブランチの存在を確実にするため)
+          git commit --allow-empty -m "chore: create release branch for version $version"
+
+          # リリースブランチをプッシュ
+          git push origin release/$version
