@@ -7,12 +7,12 @@ on:
         type: choice
         description: Version bump type
         options:
-          - MAJOR / 互換性のない変更が加えられた場合に増加
-          - MINOR / 互換性を保った新機能が追加された場合に増加
-          - PATCH / バグ修正や小規模な変更が行われた場合に増加
+          - MAJOR
+          - MINOR
+          - PATCH
       date:
         type: string
-        description: release date
+        description: リリース日
         default: $(date +'%Y-%m-%d')
 
 jobs:
