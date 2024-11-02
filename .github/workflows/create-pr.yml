@@ -3,29 +3,59 @@ name: Create Release Branch and PR
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: "作成するバージョンを入力してください"
-        required: true
+      version_bump_type:
+        type: choice
+        description: Version bump type
+        options:
+          - MAJOR / 互換性のない変更が加えられた場合に増加
+          - MINOR / 互換性を保った新機能が追加された場合に増加
+          - PATCH / バグ修正や小規模な変更が行われた場合に増加
+      date:
+        type: string
+        description: release date
+        default: $(date +'%Y-%m-%d')
 
 jobs:
   create_pr:
     runs-on: ubuntu-latest
     env:
-      # githubのコンソールから入力したリリース名を環境変数へ保存
-      RELEASE_BRANCH_NAME: release/${{ github.event.inputs.version }}
+      RELEASE_BRANCH_NAME: release/${{ github.event.inputs.date }}
+      JSON_FILE_PATH: package.json
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
       - uses: actions/setup-ruby@v1
         with:
           ruby-version: 3.1
-      # releasブランチを作成
-      - name: Create and push release branch
+      - name: Create release branch
         run: |
           git checkout -b ${{ env.RELEASE_BRANCH_NAME }}
-          git push origin ${{ env.RELEASE_BRANCH_NAME }}
       - run: gem install --no-document git-pr-release
-      # releasブランチ -> mainブランチへのPull Requestを作成
+      - name: Update version
+        run: |
+          version_bump_type=${{ github.event.inputs.version_bump_type }}
+          current_version=$(jq -r .version ${{ env.JSON_FILE_PATH }})
+          IFS='.' read -r -a version_parts <<< "$current_version"
+          case $version_bump_type in
+            MAJOR)
+              version_parts[0]=$((version_parts[0] + 1))
+              version_parts[1]=0
+              version_parts[2]=0
+              ;;
+            MINOR)
+              version_parts[1]=$((version_parts[1] + 1))
+              version_parts[2]=0
+              ;;
+            PATCH)
+              version_parts[2]=$((version_parts[2] + 1))
+              ;;
+          esac
+          new_version="${version_parts[0]}.${version_parts[1]}.${version_parts[2]}"
+          jq ".version = \"$new_version\"" ${{ env.JSON_FILE_PATH }} > ${{ env.JSON_FILE_PATH }}.tmp
+          mv ${{ env.JSON_FILE_PATH }}.tmp ${{ env.JSON_FILE_PATH }}
+          git add ${{ env.JSON_FILE_PATH }}
+          git commit -m "chore: bump version to $new_version"
+          git push origin ${{ env.RELEASE_BRANCH_NAME }}
       - name: Create PR for release
         run: git-pr-release --squash
         env:
@@ -33,7 +63,7 @@ jobs:
           GIT_PR_RELEASE_BRANCH_PRODUCTION: main
           GIT_PR_RELEASE_BRANCH_STAGING: ${{ env.RELEASE_BRANCH_NAME }}
           GIT_PR_RELEASE_LABELS: release
-          GIT_PR_RELEASE_TEMPLATE: pr-release.template.erb
+          GIT_PR_RELEASE_TEMPLATE: .github/workflows/git-pr-release.erb
           TZ: Asia/Tokyo
 # name: Create Release Branch
 
