@@ -24,9 +24,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - uses: actions/setup-ruby@v1
-        with:
-          ruby-version: 3.1
       - name: Set up Git user
         run: |
           git config --global user.email "tset@example.com"
@@ -34,7 +31,6 @@ jobs:
       - name: Create release branch
         run: |
           git checkout -b ${{ env.RELEASE_BRANCH_NAME }}
-      - run: gem install --no-document git-pr-release
       - name: Update version
         run: |
           version_bump_type=${{ github.event.inputs.version_bump_type }}
@@ -60,15 +56,14 @@ jobs:
           git add ${{ env.JSON_FILE_PATH }}
           git commit -m "chore: bump version to $new_version"
           git push origin ${{ env.RELEASE_BRANCH_NAME }}
+      - name: Install GitHub CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install gh -y
       - name: Create PR for release
-        run: git-pr-release --squash
-        env:
-          GIT_PR_RELEASE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GIT_PR_RELEASE_BRANCH_PRODUCTION: main
-          GIT_PR_RELEASE_BRANCH_STAGING: ${{ env.RELEASE_BRANCH_NAME }}
-          GIT_PR_RELEASE_LABELS: release
-          # GIT_PR_RELEASE_TEMPLATE: .github/workflows/git-pr-release.erb
-          TZ: Asia/Tokyo
+        run: |
+          gh auth login --with-token <<< "${{ secrets.GITHUB_TOKEN }}"
+          gh pr create --base main --head ${{ env.RELEASE_BRANCH_NAME }} --title "Release ${{ env.RELEASE_BRANCH_NAME }}" --body "This is an automated release PR."
 # name: Create Release Branch
 
 # on:
