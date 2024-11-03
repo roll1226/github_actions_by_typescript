@@ -67,7 +67,7 @@ jobs:
           GIT_PR_RELEASE_BRANCH_PRODUCTION: main
           GIT_PR_RELEASE_BRANCH_STAGING: ${{ env.RELEASE_BRANCH_NAME }}
           GIT_PR_RELEASE_LABELS: release
-          GIT_PR_RELEASE_TEMPLATE: .github/workflows/git-pr-release.erb
+          # GIT_PR_RELEASE_TEMPLATE: .github/workflows/git-pr-release.erb
           TZ: Asia/Tokyo
 # name: Create Release Branch
 
