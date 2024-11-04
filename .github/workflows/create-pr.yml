@@ -24,6 +24,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+      - name: Generate GitHub Apps token
+        id: generate
+        env:
+          APP_ID: ${{ secrets.APP_ID }}
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+        run: |
+          .github/workflows/configs/github-app.sh
       - name: Set up Git user
         run: |
           git config --global user.email "tset@example.com"
@@ -62,5 +69,5 @@ jobs:
           sudo apt-get install gh -y
       - name: Create PR for release
         run: |
-          gh auth login --with-token <<< "${{ secrets.GITHUB_TOKEN }}"
-          gh pr create --base main --head ${{ env.RELEASE_BRANCH_NAME }} --title "Release ${{ env.RELEASE_BRANCH_NAME }}" --body "This is an automated release PR."
+          gh auth login --with-token <<< "${{ steps.generate.outputs.token }}"
+          gh pr create --base main --head ${{ env.RELEASE_BRANCH_NAME }} --title "Release ${{ env.RELEASE_BRANCH_NAME }}" --label "release"
