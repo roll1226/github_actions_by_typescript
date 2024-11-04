@@ -67,9 +67,10 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install gh -y
-      - name: Create PR for release
-        env:
-          GH_TOKEN: ${{ steps.generate.outputs.token }}
+      - name: Authenticate with GitHub CLI
         run: |
           gh auth login --with-token <<< "${{ steps.generate.outputs.token }}"
+          unset GH_TOKEN
+      - name: Create PR for release
+        run: |
           gh pr create --base main --head ${{ env.RELEASE_BRANCH_NAME }} --title "Release ${{ env.RELEASE_BRANCH_NAME }}" --label "release"
