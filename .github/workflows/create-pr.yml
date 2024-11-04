@@ -73,4 +73,4 @@ jobs:
           unset GH_TOKEN
       - name: Create PR for release
         run: |
-          gh pr create --base main --head ${{ env.RELEASE_BRANCH_NAME }} --title "Release ${{ env.RELEASE_BRANCH_NAME }}" --label "release"
+          gh pr create --base main --head ${{ env.RELEASE_BRANCH_NAME }} --title "Release ${{ env.RELEASE_BRANCH_NAME }}" --label "release" --body ""
