@@ -30,7 +30,7 @@ jobs:
           APP_ID: ${{ secrets.APP_ID }}
           PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
         run: |
-          .github/workflows/configs/github-app.sh
+          .github/workflows/actions/github-app.sh
       - name: Set up Git user
         run: |
           git config --global user.email "tset@example.com"
