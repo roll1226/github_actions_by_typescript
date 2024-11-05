@@ -34,8 +34,8 @@ jobs:
           .github/workflows/actions/github-app.sh
       - name: Set up Git user
         run: |
-          git config --global user.email "onfleek_bot@example.com"
-          git config --global user.name "onfleek_bot"
+          git config --global user.email "bot@example.com"
+          git config --global user.name "bot"
       - name: Set release branch name
         id: set_release_branch_name
         env:
