@@ -40,7 +40,7 @@ jobs:
         id: set_release_branch_name
         run: |
           if [ -z "${{ github.event.inputs.date }}" ]; then
-            DATE=$(date +%Y-%m-%d)
+            DATE=$(date -d "${{ github.event.inputs.date }} +1 day" +%Y-%m-%d)
           else
             DATE=${{ github.event.inputs.date }}
           fi
