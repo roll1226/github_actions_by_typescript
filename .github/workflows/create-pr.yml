@@ -10,6 +10,7 @@ on:
           - MAJOR
           - MINOR
           - PATCH
+          - NONE
       date:
         type: string
         description: リリース日
@@ -67,6 +68,9 @@ jobs:
               ;;
             PATCH)
               version_parts[2]=$((version_parts[2] + 1))
+              ;;
+            NONE)
+              echo "No version bump"
               ;;
           esac
           new_version="${version_parts[0]}.${version_parts[1]}.${version_parts[2]}"
