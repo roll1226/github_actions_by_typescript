@@ -13,7 +13,7 @@ jobs:
         with:
           rules: |
             main <- release/**
-            release/** <- feature/** fix/** update/** refactor/** doc/** deps/**
+            release/* <- feature/** fix/** update/** refactor/** doc/** deps/**
             feature/* <- feature/**
             feature/* <- update/**
             update/* <- update/**
