@@ -11,7 +11,6 @@ async function run() {
     console.log(`Payload: ${JSON.stringify(payload, null, 2)}`);
 
     // インプットパラメータを取得
-
     const whoToGreet = core.getInput("who-to-greet");
     console.log(`Hello ${whoToGreet}!`);
 
