@@ -12,9 +12,9 @@ jobs:
       - uses: agaroot-technologies/action-restrict-base-branch@v1.0.2
         with:
           rules: |
-            main <- release/**
-            release/* <- feature/** fix/** update/** refactor/** doc/** deps/**
-            feature/* <- feature/**
-            feature/* <- update/**
-            update/* <- update/**
-            update/* <- feature/**
+            main <- release/*
+            release/* <- feature/**/* fix/**/* update/**/* refactor/**/* doc/**/* deps/**/*
+            feature/* <- feature/**/*
+            feature/* <- update/**/*
+            update/* <- update/**/*
+            update/* <- feature/**/*
