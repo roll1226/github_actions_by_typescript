@@ -13,7 +13,6 @@ async function run() {
     // インプットパラメータを取得
     const whoToGreet = core.getInput("who-to-greet");
     console.log(`Hello ${whoToGreet}!`);
-
     // 現在の時間を出力として設定
     const time = new Date().toTimeString();
     core.setOutput("time", time);
