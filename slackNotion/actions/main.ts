@@ -22,6 +22,7 @@ async function run() {
       core.setFailed(`Action failed with error: ${error.message}`);
     } else {
       core.setFailed(`Action failed with unknown error: ${error}`);
+
     }
   }
 }
