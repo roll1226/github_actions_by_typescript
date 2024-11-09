@@ -14,7 +14,8 @@ jobs:
           rules: |
             main <- release/*
             release/* <- feature/**/* fix/**/* update/**/* refactor/**/* doc/**/* deps/**/*
-            feature/* <- feature/**/*
-            feature/* <- update/**/*
-            update/* <- update/**/*
-            update/* <- feature/**/*
+            feature/**/* <- feature/**/*
+            feature/**/* <- update/**/*
+            update/**/* <- update/**/*
+            update/**/* <- feature/**/*
+
