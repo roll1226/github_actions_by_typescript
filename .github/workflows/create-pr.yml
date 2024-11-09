@@ -10,31 +10,47 @@ on:
           - MAJOR
           - MINOR
           - PATCH
+          - NONE
       date:
         type: string
         description: リリース日
-        default: $(date +'%Y-%m-%d')
+        default: ""
 
 jobs:
   create_pr:
     runs-on: ubuntu-latest
     env:
-      RELEASE_BRANCH_NAME: release/${{ github.event.inputs.date }}
       JSON_FILE_PATH: package.json
+    outputs:
+      release_branch_name: ${{ steps.set_release_branch_name.outputs.release_branch_name }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - uses: actions/setup-ruby@v1
-        with:
-          ruby-version: 3.1
+      - name: Generate GitHub Apps token
+        id: generate
+        env:
+          APP_ID: ${{ secrets.APP_ID }}
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+        run: |
+          .github/workflows/actions/github-app.sh
       - name: Set up Git user
         run: |
-          git config --global user.email "tset@example.com"
-          git config --global user.name "example"
+          git config --global user.email "bot@example.com"
+          git config --global user.name "bot"
+      - name: Set release branch name
+        id: set_release_branch_name
+        env:
+          TZ: Asia/Tokyo
+        run: |
+          if [ -z "${{ github.event.inputs.date }}" ]; then
+            DATE=$(date +%Y-%m-%d)
+          else
+            DATE=${{ github.event.inputs.date }}
+          fi
+          echo "::set-output name=release_branch_name::release/$DATE"
       - name: Create release branch
         run: |
-          git checkout -b ${{ env.RELEASE_BRANCH_NAME }}
-      - run: gem install --no-document git-pr-release
+          git checkout -b ${{ steps.set_release_branch_name.outputs.release_branch_name }}
       - name: Update version
         run: |
           version_bump_type=${{ github.event.inputs.version_bump_type }}
@@ -53,60 +69,24 @@ jobs:
             PATCH)
               version_parts[2]=$((version_parts[2] + 1))
               ;;
+            NONE)
+              echo "No version bump"
+              ;;
           esac
           new_version="${version_parts[0]}.${version_parts[1]}.${version_parts[2]}"
           jq ".version = \"$new_version\"" ${{ env.JSON_FILE_PATH }} > ${{ env.JSON_FILE_PATH }}.tmp
           mv ${{ env.JSON_FILE_PATH }}.tmp ${{ env.JSON_FILE_PATH }}
           git add ${{ env.JSON_FILE_PATH }}
           git commit -m "chore: bump version to $new_version"
-          git push origin ${{ env.RELEASE_BRANCH_NAME }}
+          git push origin ${{ steps.set_release_branch_name.outputs.release_branch_name }}
+      - name: Install GitHub CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install gh -y
+      - name: Authenticate with GitHub CLI
+        run: |
+          gh auth login --with-token <<< "${{ steps.generate.outputs.token }}"
+          unset GH_TOKEN
       - name: Create PR for release
-        run: git-pr-release --squash
-        env:
-          GIT_PR_RELEASE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GIT_PR_RELEASE_BRANCH_PRODUCTION: main
-          GIT_PR_RELEASE_BRANCH_STAGING: ${{ env.RELEASE_BRANCH_NAME }}
-          GIT_PR_RELEASE_LABELS: release
-          # GIT_PR_RELEASE_TEMPLATE: .github/workflows/git-pr-release.erb
-          TZ: Asia/Tokyo
-# name: Create Release Branch
-
-# on:
-#   push:
-#     branches:
-#       - main
-#   workflow_dispatch:
-
-# jobs:
-#   create-release-branch:
-#     runs-on: ubuntu-latest
-
-#     steps:
-#       # リポジトリをチェックアウト
-#       - name: Check out repository
-#         uses: actions/checkout@v2
-
-#       # 現在のバージョンを取得
-#       - name: Get Current Version
-#         id: version
-#         run: |
-#           # バージョン番号を取得 (例: package.json)
-#           VERSION=$(jq -r .version package.json)
-#           echo "version=$VERSION" >> $GITHUB_ENV
-
-#       # リリース用のブランチを作成してプッシュ
-#       - name: Create and Push Release Branch
-#         env:
-#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#         run: |
-#           git config --global user.name "github-actions[bot]"
-#           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-#           # リリースブランチを作成
-#           git checkout -b release/$version
-
-#           # 空のコミットを作成 (リリースブランチの存在を確実にするため)
-#           git commit --allow-empty -m "chore: create release branch for version $version"
-
-#           # リリースブランチをプッシュ
-#           git push origin release/$version
+        run: |
+          gh pr create --base main --head ${{ steps.set_release_branch_name.outputs.release_branch_name }} --title "Release ${{ steps.set_release_branch_name.outputs.release_branch_name }}" --label "release" --body ""
